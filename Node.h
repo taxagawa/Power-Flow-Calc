@@ -14,12 +14,22 @@ public:
 
     int getID() const;
 
+    void setActivePower(double activePower);
+
+    double getActivePower() const;
+
+    void setReactivePower(double reactivePower);
+
+    double getReactivePower() const;
+
 private:
     //ノード番号
     int _id;
 
+    //idを格納
     std::vector<int> _from;
 
+    //idを格納
     std::vector<int> _to;
 
     //有効電力

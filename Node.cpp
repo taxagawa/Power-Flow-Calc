@@ -21,3 +21,27 @@ int Node::getId() const
 {
     return _id;
 }
+
+//======================================================================
+void Node::setActivePower(double activePower)
+{
+    _activePower = activePower;
+}
+
+//======================================================================
+double Node::getActivePower() const
+{
+    return _activePower;
+}
+
+//======================================================================
+void Node::setReactivePower(double reactivePower)
+{
+    _reactivePower = reactivePower;
+}
+
+//======================================================================
+double Node::getReactivePower() const
+{
+    return _reactivePower;
+}

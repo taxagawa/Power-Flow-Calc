@@ -10,8 +10,9 @@ public:
 
     ~BFSCalc();
 
+    //入力ファイルのセッティング
     void dataSetting(int argc, char** argv);
-
+    
 private:
     FileIO* _fileIO;
 

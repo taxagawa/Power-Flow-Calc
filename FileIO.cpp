@@ -43,3 +43,13 @@ string FileIO::getDataPath() const
 }
 
 //====================================================================
+void FileIO::setInputs()
+{
+
+}
+
+//====================================================================
+string FileIO::addPath(string file)
+{
+    return _dataPath + file;
+}

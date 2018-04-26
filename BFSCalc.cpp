@@ -18,7 +18,9 @@ BFSCalc::~BFSCalc()
 //======================================================================
 void BFSCalc::dataSetting(int argc, char** argv)
 {
-    _fileIO->pathSetting(argc, argv);
+    _fileIO->setDataPath(argc, argv);
+
+    _fileIO->setInputs();
 }
 
 //======================================================================
