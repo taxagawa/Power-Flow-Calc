@@ -1,15 +1,19 @@
 #ifndef __FILEIO_H__
 #define __FILEIO_H__
 
-#include "FileIOManager.h"
+#include <string>
 
 class FileIO
 {
-public:
-    bool pathSetting(int argc, char** argv);
+protected:
+    //オプション解析
+    bool setDataPath(int argc, char** argv);
 
+    //パスを返す
+    std::string getDataPath() const;
 private:
-    FileIOManager* fileIOm;
+    //パス
+    std::string _dataPath;
 };
 
 #endif //__FILEIO_H__
