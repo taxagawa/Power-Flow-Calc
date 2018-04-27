@@ -26,11 +26,11 @@ private:
     //ノード番号
     int _id;
 
-    //idを格納
-    std::vector<int> _from;
+    //親ノードのidを格納
+    int _parentNode;
 
-    //idを格納
-    std::vector<int> _to;
+    //子ノードのidを格納
+    std::vector<int> _childNodes;
 
     //有効電力
     double _activePower;

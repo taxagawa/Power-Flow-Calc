@@ -1,10 +1,16 @@
 #include "FileIO.h"
 #include <string>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <getopt.h>
 
 using namespace std;
+
+//====================================================================
+FileIO::FileIO(): _dataPath("./")
+{
+}
 
 //====================================================================
 bool FileIO::setDataPath(int argc, char** argv)
@@ -43,9 +49,16 @@ string FileIO::getDataPath() const
 }
 
 //====================================================================
-void FileIO::setInputs()
+vector< vector<string> > FileIO::getConnections()
 {
+    ifstream inConnectFile(addPath("connection.txt").c_str(), ios::in);
+    if (!inConnectFile)
+    {
+        cerr << "Error: cannot find or open connection file" << endl;
+        exit(EXIT_FAILURE);
+    }
 
+    
 }
 
 //====================================================================

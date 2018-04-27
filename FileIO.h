@@ -2,17 +2,21 @@
 #define __FILEIO_H__
 
 #include <string>
+#include <vector>
 
 class FileIO
 {
 public:
+    FileIO();
+
     //オプション解析
     bool setDataPath(int argc, char** argv);
 
     //パスを返す
     std::string getDataPath() const;
 
-    void setInputs();
+    //接続状況をファイルから取得して返す
+    std::vector< std::vector<std::string> > getConnections();
 
 
 private:
