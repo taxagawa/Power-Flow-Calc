@@ -49,16 +49,49 @@ string FileIO::getDataPath() const
 }
 
 //====================================================================
-vector< vector<string> > FileIO::getConnections()
+void FileIO::readLinkInfo()
 {
-    ifstream inConnectFile(addPath("connection.txt").c_str(), ios::in);
+    ifstream inConnectFile(addPath("link.txt").c_str(), ios::in);
     if (!inConnectFile)
     {
-        cerr << "Error: cannot find or open connection file" << endl;
+        cerr << "Error: cannot find or open link file" << endl;
         exit(EXIT_FAILURE);
     }
 
-    
+    string str;
+    while (getline(inConnectFile, str))
+    {
+        _linkInfo.push_back(split(str, ','))
+    }
+}
+
+//====================================================================
+void FileIO::readInitPower()
+{
+    ifstream inPowerfile(addPath("power.txt").c_str(), ios::in);
+    if (!inPowerfile)
+    {
+        cerr << "Error: cannot find or open power file" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    string str;
+    while (getline(inPowerfile, str))
+    {
+        _initPower.push_back(split(str, ','))
+    }
+}
+
+//====================================================================
+std::vector< std::vector<std::string> > FileIO::getLinkInfo() const
+{
+    return _linkInfo;
+}
+
+//====================================================================
+std::vector< std::vector<std::string> > FileIO::getInitPower() const
+{
+    return _initPower;
 }
 
 //====================================================================

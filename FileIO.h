@@ -15,13 +15,26 @@ public:
     //パスを返す
     std::string getDataPath() const;
 
-    //接続状況をファイルから取得して返す
-    std::vector< std::vector<std::string> > getConnections();
+    //リンク情報をファイルから読み込む
+    void readLinkInfo();
 
+    //初期電力情報をファイルから読み込む
+    void readInitPower();
+
+    //リンク情報を返す
+    std::vector< std::vector<std::string> > getLinkInfo() const;
+
+    //初期電力情報を返す
+    std::vector< std::vector<std::string> > getInitPower() const;
 
 private:
     //パス
     std::string _dataPath;
+
+    //リンク情報
+    std::vector< std::vector<std::string> > _linkInfo;
+
+    std::vector< std::vector<std::string> > _initPower;
 
 private:
     //_dataPathにファイル名を追加
