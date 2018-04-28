@@ -1,5 +1,6 @@
 #include "BFSCalc.h"
 #include "FileIO.h"
+#include <string>
 
 using namespace std;
 
@@ -18,9 +19,8 @@ BFSCalc::~BFSCalc()
 //======================================================================
 void BFSCalc::dataSetting(int argc, char** argv)
 {
-    _fileIO->setDataPath(argc, argv);
+    _fileIO->setData(argc, argv);
 
-    _fileIO->setInputs();
+    _linkInfo  = _filiIO->getLinkInfo();
+    _initPower = _fileIO->getInitPower();
 }
-
-//======================================================================

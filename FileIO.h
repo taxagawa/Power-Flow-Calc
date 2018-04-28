@@ -9,11 +9,8 @@ class FileIO
 public:
     FileIO();
 
-    //オプション解析
-    bool setDataPath(int argc, char** argv);
-
-    //パスを返す
-    std::string getDataPath() const;
+    //オプション解析+データセッティング
+    bool setData(int argc, char** argv);
 
     //リンク情報をファイルから読み込む
     void readLinkInfo();
@@ -34,6 +31,7 @@ private:
     //リンク情報
     std::vector< std::vector<std::string> > _linkInfo;
 
+    //初期電力情報
     std::vector< std::vector<std::string> > _initPower;
 
 private:

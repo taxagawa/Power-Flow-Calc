@@ -12,10 +12,15 @@ public:
 
     //入力ファイルのセッティング
     void dataSetting(int argc, char** argv);
-    
+
 private:
     FileIO* _fileIO;
 
+    //リンク情報
+    std::vector< std::vector<std::string> > _linkInfo;
+
+    //初期電力情報
+    std::vector< std::vector<std::string> > _initPower;
 
 };
 

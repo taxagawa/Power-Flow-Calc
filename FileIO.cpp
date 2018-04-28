@@ -13,7 +13,7 @@ FileIO::FileIO(): _dataPath("./")
 }
 
 //====================================================================
-bool FileIO::setDataPath(int argc, char** argv)
+bool FileIO::setData(int argc, char** argv)
 {
     int opt;
 
@@ -39,13 +39,10 @@ bool FileIO::setDataPath(int argc, char** argv)
         }
     }
 
-    return true;
-}
+    readLinkInfo();
+    readInitPower();
 
-//====================================================================
-string FileIO::getDataPath() const
-{
-    return _dataPath;
+    return true;
 }
 
 //====================================================================
