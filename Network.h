@@ -2,31 +2,37 @@
 #define __NETWORK_H__
 
 #include "Node.h"
-#include "Link.h"
+#include "Utility.h"
 #include <string>
 #include <vector>
 
 class Network
 {
 public:
-    Network(std::vector< std::vector<std::string> > _linkInfo, std::vector< std::vector<std::string> > _initPower);
+    Network(SVEC _linkInfo, SVEC _initPower);
 
     ~Network();
 
+    //ノード集合のゲッター
     std::vector<Node*> getNodes() const;
 
-    std::vector<Link*> getLinks() const;
-
+    //ノード・インピーダンスの設定
     void buildNetwork();
-    
+
 private:
-    std::vector< std::vector<std::string> > _link;
+    SVEC _link;
 
-    std::vector< std::vector<std::string> > _power;
+    SVEC _power;
 
+    //ノードの集合
     std::vector<Node*> _nodes;
 
-    std::vector<Link*> _links;
+    //レジスタンス行列
+    DVEC _R;
+
+    //リアクタンス行列
+    DVEC _X;
+
 };
 
 #endif //__NETWORK_H__

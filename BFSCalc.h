@@ -2,6 +2,7 @@
 #define __BFSCALC_H__
 
 #include "FileIO.h"
+#include "Utility.h"
 
 class BFSCalc
 {
@@ -17,10 +18,10 @@ private:
     FileIO* _fileIO;
 
     //リンク情報
-    std::vector< std::vector<std::string> > _linkInfo;
+    SVEC _linkInfo;
 
     //初期電力情報
-    std::vector< std::vector<std::string> > _initPower;
+    SVEC _initPower;
 
 };
 

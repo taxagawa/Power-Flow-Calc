@@ -6,7 +6,7 @@
 class Node
 {
 public:
-    Node();
+    explicit Node(int id);
 
     //virtual ~Node();
 
@@ -37,6 +37,12 @@ private:
 
     //無効電力
     double _reactivePower;
+
+    //振幅
+    double _amplitude;
+
+    //位相
+    double _angle;
 
 };
 

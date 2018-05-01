@@ -1,4 +1,5 @@
 #include "FileIO.h"
+#include "Utility.h"
 #include <string>
 #include <cstdlib>
 #include <fstream>
@@ -80,13 +81,13 @@ void FileIO::readInitPower()
 }
 
 //====================================================================
-std::vector< std::vector<std::string> > FileIO::getLinkInfo() const
+SVEC FileIO::getLinkInfo() const
 {
     return _linkInfo;
 }
 
 //====================================================================
-std::vector< std::vector<std::string> > FileIO::getInitPower() const
+SVEC FileIO::getInitPower() const
 {
     return _initPower;
 }

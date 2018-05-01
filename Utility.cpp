@@ -1,6 +1,7 @@
 #include "Utility.h"
 #include <string>
 #include <sstream>
+#include <cmath>
 
 using namespace std;
 
@@ -38,4 +39,10 @@ string Utility::dtostr(double src)
     stringstream str;
     str << src;
     return str.str();
+}
+
+//======================================================================
+double Utility::distance(double x, double y)
+{
+    return sqrt(x * x + y * y);
 }

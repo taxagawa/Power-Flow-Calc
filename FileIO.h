@@ -1,6 +1,7 @@
 #ifndef __FILEIO_H__
 #define __FILEIO_H__
 
+#include "Utility.h"
 #include <string>
 #include <vector>
 
@@ -19,20 +20,20 @@ public:
     void readInitPower();
 
     //リンク情報を返す
-    std::vector< std::vector<std::string> > getLinkInfo() const;
+    SVEC getLinkInfo() const;
 
     //初期電力情報を返す
-    std::vector< std::vector<std::string> > getInitPower() const;
+    SVEC getInitPower() const;
 
 private:
     //パス
     std::string _dataPath;
 
     //リンク情報
-    std::vector< std::vector<std::string> > _linkInfo;
+    SVEC _linkInfo;
 
     //初期電力情報
-    std::vector< std::vector<std::string> > _initPower;
+    SVEC _initPower;
 
 private:
     //_dataPathにファイル名を追加
