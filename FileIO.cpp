@@ -1,9 +1,11 @@
 #include "FileIO.h"
 #include "Utility.h"
 #include <string>
+#include <vector>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <getopt.h>
 
 using namespace std;
@@ -59,7 +61,7 @@ void FileIO::readLinkInfo()
     string str;
     while (getline(inConnectFile, str))
     {
-        _linkInfo.push_back(split(str, ','))
+        _linkInfo.push_back(split(str, ','));
     }
 }
 
@@ -76,7 +78,7 @@ void FileIO::readInitPower()
     string str;
     while (getline(inPowerfile, str))
     {
-        _initPower.push_back(split(str, ','))
+        _initPower.push_back(split(str, ','));
     }
 }
 
@@ -96,4 +98,16 @@ SVEC FileIO::getInitPower() const
 string FileIO::addPath(string file)
 {
     return _dataPath + file;
+}
+
+//====================================================================
+vector<string> FileIO::split(const string &str, char delim){
+    istringstream iss(str);
+    string tmp;
+    vector<string> res;
+    while(getline(iss, tmp, delim))
+    {
+        res.push_back(tmp);
+    }
+    return res;
 }

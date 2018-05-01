@@ -38,6 +38,8 @@ private:
 private:
     //_dataPathにファイル名を追加
     std::string addPath(std::string file);
+
+    std::vector<std::string> split(const std::string &str, char delim);
 };
 
 #endif //__FILEIO_H__

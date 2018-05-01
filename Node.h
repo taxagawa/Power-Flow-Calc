@@ -10,9 +10,11 @@ public:
 
     //virtual ~Node();
 
-    void setId(const int& id);
+    int getId() const;
 
-    int getID() const;
+    void setParentNode(int parentNode);
+
+    int getParentNode() const;
 
     void setActivePower(double activePower);
 
@@ -21,6 +23,14 @@ public:
     void setReactivePower(double reactivePower);
 
     double getReactivePower() const;
+
+    void setAmplitude(double amplitude);
+
+    double getAmplitude() const;
+
+    void setAngle(double angle);
+
+    double getAngle() const;
 
 private:
     //ノード番号

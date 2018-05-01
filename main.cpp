@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     atexit(exitFunc);
 
     bfsC.reset(new BFSCalc());
-    bfsC->dataSetting(argc, argv)
+    bfsC->dataSetting(argc, argv);
 
     exit(EXIT_SUCCESS);
 }
