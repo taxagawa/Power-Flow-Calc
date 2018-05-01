@@ -10,6 +10,7 @@ public:
 
     //virtual ~Node();
 
+    //getter & setter
     int getId() const;
 
     void setParentNode(int parentNode);
