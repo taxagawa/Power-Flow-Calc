@@ -34,6 +34,12 @@ int Node::getParentNode() const
 }
 
 //======================================================================
+std::vector<int> Node::getChildNodes() const
+{
+    return _childNodes;
+}
+
+//======================================================================
 void Node::setActivePower(double activePower)
 {
     _activePower = activePower;

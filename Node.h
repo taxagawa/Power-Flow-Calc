@@ -13,22 +13,30 @@ public:
     //getter & setter
     int getId() const;
 
+    //parentNode
     void setParentNode(int parentNode);
 
     int getParentNode() const;
 
+    //childNodes
+    std::vector<int> getChildNodes() const;
+
+    //activePower
     void setActivePower(double activePower);
 
     double getActivePower() const;
 
+    //reactivePower
     void setReactivePower(double reactivePower);
 
     double getReactivePower() const;
 
+    //amplitude
     void setAmplitude(double amplitude);
 
     double getAmplitude() const;
 
+    //angle
     void setAngle(double angle);
 
     double getAngle() const;

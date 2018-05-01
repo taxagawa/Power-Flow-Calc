@@ -23,14 +23,12 @@ Network::~Network()
 }
 
 //======================================================================
-vector<Node*> Network::getNodes() const
-{
-    return _nodes;
-}
-
-//======================================================================
 void Network::buildNetwork()
 {
+    //Todo:計算量が多いので余裕があればパフォーマンスチューニング
+    //それとメソッドかクラスに分ける
+
+    //ノードの接続状況とインピーダンス行列の生成
     for (int i = 0; i < _link.size(); i++)
     {
         Node* _node = NULL;
@@ -47,6 +45,7 @@ void Network::buildNetwork()
         _nodes.push_back(_node);
     }
 
+    //初期の電力,振幅,位相の設定
     for (int i = 0; i < _power.size(); i++)
     {
         if (Utility::strtod(_power[i][1]) != 0.0 || Utility::strtod(_power[i][2]) != 0.0)
@@ -66,11 +65,37 @@ void Network::buildNetwork()
         }
     }
 
+    //子ノードのvectorを生成 O(n^2)
     for (int i = 0; i < _link.size(); i++)
     {
         for (int j = 0; j < _link.size(); j++)
         {
-
+            if (j == i)
+            {
+                continue;
+            }
+            else if (_nodes[j]->getParentNode() == _nodes[i]->getId())
+            {
+                _nodes[i]->getChildNodes().push_back(_nodes[j]->getId());
+            }
         }
     }
+}
+
+//======================================================================
+vector<Node*> Network::getNodes() const
+{
+    return _nodes;
+}
+
+//======================================================================
+DVEC Network::getR() const;
+{
+    return _R;
+}
+
+//======================================================================
+DVEC Network::getX() const;
+{
+    return _X;
 }

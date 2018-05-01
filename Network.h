@@ -13,11 +13,15 @@ public:
 
     ~Network();
 
-    //ノード集合のゲッター
-    std::vector<Node*> getNodes() const;
-
     //ノード・インピーダンスの設定
     void buildNetwork();
+
+    //getter
+    std::vector<Node*> getNodes() const;
+
+    DVEC getR() const;
+
+    DVEC getX() const;
 
 private:
     SVEC _link;

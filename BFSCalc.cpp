@@ -9,6 +9,7 @@ using namespace std;
 //======================================================================
 BFSCalc::BFSCalc()
 {
+    //オブジェクトをメンバ変数にするのと、一時オブジェクトとして使うことの違いは？
     _fileIO = new FileIO();
 }
 
@@ -27,4 +28,5 @@ void BFSCalc::dataSetting(int argc, char** argv)
     _initPower = _fileIO->getInitPower();
 
     Network* _network = new Network(_linkInfo, _initPower);
+    _network->buildNetwork();
 }
