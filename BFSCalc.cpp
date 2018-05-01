@@ -1,5 +1,6 @@
 #include "BFSCalc.h"
 #include "FileIO.h"
+#include "Network.h"
 #include <string>
 
 using namespace std;
@@ -23,4 +24,7 @@ void BFSCalc::dataSetting(int argc, char** argv)
 
     _linkInfo  = _filiIO->getLinkInfo();
     _initPower = _fileIO->getInitPower();
+
+    Network _network = new Network(_linkInfo, _initPower);
+    _network.
 }
