@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
 //======================================================================
-Network::Network(SVEC _linkInfo, SVEC _initPower)
+Network::Network(const SVEC& _linkInfo, const SVEC& _initPower)
 {
     _link  = _linkInfo;
     _power = _initPower;
@@ -29,7 +30,7 @@ void Network::buildNetwork()
     //それとメソッドかクラスに分ける
 
     //ノードの接続状況とインピーダンス行列の生成
-    for (int i = 0; i < _link.size(); i++)
+    for (int i = 0; i < _link.size()-1; i++)
     {
         Node* _node = NULL;
         _node = new Node(Utility::strtoi(_link[i][1]));
@@ -43,10 +44,11 @@ void Network::buildNetwork()
         _X[_node->getParentNode()][_node->getId()] = Utility::strtod(_link[i][3]);
 
         _nodes.push_back(_node);
+
     }
 
     //初期の電力,振幅,位相の設定
-    for (int i = 0; i < _power.size(); i++)
+    for (int i = 0; i < _power.size()-1; i++)
     {
         if (Utility::strtod(_power[i][1]) != 0.0 || Utility::strtod(_power[i][2]) != 0.0)
         {
@@ -66,9 +68,9 @@ void Network::buildNetwork()
     }
 
     //子ノードのvectorを生成 O(n^2)
-    for (int i = 0; i < _link.size(); i++)
+    for (int i = 0; i < _link.size()-1; i++)
     {
-        for (int j = 0; j < _link.size(); j++)
+        for (int j = 0; j < _link.size()-1; j++)
         {
             if (j == i)
             {
@@ -89,13 +91,13 @@ vector<Node*> Network::getNodes() const
 }
 
 //======================================================================
-DVEC Network::getR() const;
+DVEC Network::getR() const
 {
     return _R;
 }
 
 //======================================================================
-DVEC Network::getX() const;
+DVEC Network::getX() const
 {
     return _X;
 }

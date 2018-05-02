@@ -9,7 +9,7 @@
 class Network
 {
 public:
-    Network(SVEC _linkInfo, SVEC _initPower);
+    Network(const SVEC& _linkInfo, const SVEC& _initPower);
 
     ~Network();
 
