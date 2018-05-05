@@ -41,7 +41,18 @@ public:
 
     double getAngle() const;
 
-private:
+    //比較演算子のオーバーロード
+    bool operator<(const Node* node) const
+    {
+        return _id < node._id;
+    }
+
+    inline bool operator >=(const Node* node) const
+    {
+        return !(*this < node);
+    }
+
+protected:
     //ノード番号
     int _id;
 
@@ -59,6 +70,9 @@ private:
 
     //振幅
     double _amplitude;
+
+    //k-1ステップ目の振幅
+    double _preAmplitude;
 
     //位相
     double _angle;

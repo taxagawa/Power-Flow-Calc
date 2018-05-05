@@ -44,7 +44,8 @@ void Network::buildNetwork()
         _X[_node->getParentNode()][_node->getId()] = Utility::strtod(_link[i][3]);
 
         _nodes.push_back(_node);
-
+        //debug
+        cout << _node->gedId() << endl;
     }
 
     //初期の電力,振幅,位相の設定

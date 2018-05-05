@@ -1,3 +1,4 @@
+#include "BFS.h"
 #include "BFSCalc.h"
 #include "FileIO.h"
 #include "Network.h"
@@ -29,4 +30,11 @@ void BFSCalc::dataSetting(int argc, char** argv)
 
     Network* _network = new Network(_linkInfo, _initPower);
     _network->buildNetwork();
+
+    _nodes = _network->getNodes();
+    _R     = _network->getR();
+    _X     = _network->getX();
+
+    BFS* _bfs = new BFS(_nodes, _R, _X);
+    _bfs->CalcLoop();
 }
