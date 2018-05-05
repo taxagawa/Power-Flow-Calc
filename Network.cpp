@@ -52,7 +52,7 @@ void Network::buildNetwork()
     //一応ソートしておく
     //第三引数にラムダ式を書いてもokらしいがコンパイルできるかわからんので一応演算子オーバーロドで
 
-    sort(_nodes.begin(), _noeds.end());
+    sort(_nodes.begin(), _nodes.end());
 
     //初期の電力,振幅,位相の設定
     for (int i = 0; i < _power.size()-1; i++)
