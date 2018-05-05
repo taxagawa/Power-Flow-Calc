@@ -5,6 +5,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -44,9 +45,14 @@ void Network::buildNetwork()
         _X[_node->getParentNode()][_node->getId()] = Utility::strtod(_link[i][3]);
 
         _nodes.push_back(_node);
+
         //debug
-        cout << _node->gedId() << endl;
+        //cout << _node->getId() << endl;
     }
+    //一応ソートしておく
+    //第三引数にラムダ式を書いてもokらしいがコンパイルできるかわからんので一応演算子オーバーロドで
+
+    sort(_nodes.begin(), _noes.end());
 
     //初期の電力,振幅,位相の設定
     for (int i = 0; i < _power.size()-1; i++)

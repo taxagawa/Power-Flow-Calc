@@ -2,6 +2,7 @@
 #define __BFSCALC_H__
 
 #include "FileIO.h"
+#include "Node.h"
 #include "Utility.h"
 
 class BFSCalc

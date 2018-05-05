@@ -61,7 +61,7 @@ bool BFS::isConvergence()
 }
 
 //======================================================================
-bool BFS::hasChild(const Node& node) const
+bool BFS::hasChild(const Node* node) const
 {
     if (node->getChildNodes().size() == 0)
     {

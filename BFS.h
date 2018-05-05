@@ -23,10 +23,10 @@ private:
     bool isConvergence();
 
     //子ノードを持つか
-    bool hasChild(const Node& node) const;
+    bool hasChild(const Node* node) const;
 
 private:
-    std::vecotr<Node*> _nodes;
+    std::vector<Node*> _nodes;
 
     const DVEC _R;
 
