@@ -52,9 +52,9 @@ void Network::buildNetwork()
     //一応idでソートしておく
     //第三引数にラムダ式を書いてもokらしいがコンパイルできるかわからんので一応演算子オーバーロードで
 
-    sort(_nodes.begin(), _nodes.end(), [](const Node& n1, const Node& n2){return (n1.getId() == n2.getId()) ? (true) : (n1.getId() < n2.getId());});
+    sort(_nodes.begin(), _nodes.end());
     //debug
-    for (int i = 0; i < _nodes.size()-1; i++)
+    for (int i = 0; i < _nodes.size(); i++)
     {
         cout << _nodes[i]->getId() << endl;
     }
