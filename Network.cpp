@@ -49,10 +49,15 @@ void Network::buildNetwork()
         //debug
         //cout << _node->getId() << endl;
     }
-    //一応ソートしておく
-    //第三引数にラムダ式を書いてもokらしいがコンパイルできるかわからんので一応演算子オーバーロドで
+    //一応idでソートしておく
+    //第三引数にラムダ式を書いてもokらしいがコンパイルできるかわからんので一応演算子オーバーロードで
 
     sort(_nodes.begin(), _nodes.end());
+    //debug
+    for (int i = 0; i < _nodes.size()-1; i++)
+    {
+        cout << _nodes[i]->getId() << endl;
+    }
 
     //初期の電力,振幅,位相の設定
     for (int i = 0; i < _power.size()-1; i++)

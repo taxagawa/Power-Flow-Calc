@@ -42,12 +42,12 @@ public:
     double getAngle() const;
 
     //比較演算子のオーバーロード
-    bool operator<(const Node* node) const
+    bool operator<(const Node& node) const
     {
-        return _id < node->_id;
+        return _id < node._id;
     }
 
-    inline bool operator >=(const Node* node) const
+    inline bool operator >=(const Node& node) const
     {
         return !(*this < node);
     }
