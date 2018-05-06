@@ -40,13 +40,13 @@ public:
     void setAngle(double angle);
 
     double getAngle() const;
-
+    /*
     //比較演算子のオーバーロード
     bool operator<(const Node& right) const
     {
-        return this._id < right._id;
+        return this->_id < right._id;
     }
-/*
+
     inline bool operator >=(const Node& node) const
     {
         return !(*this < node);

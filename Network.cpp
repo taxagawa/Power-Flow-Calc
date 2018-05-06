@@ -5,7 +5,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
-#include <algorithm>
+//#include <algorithm>
 
 using namespace std;
 
@@ -49,7 +49,8 @@ void Network::buildNetwork()
         //debug
         //cout << _node->getId() << endl;
     }
-    //一応idでソートしておく
+    /*
+    //一応idでソートしようとしたが、なぜか正しくソートされないので放置
     //第三引数にラムダ式を書いてもokらしいがコンパイルできるかわからんので一応演算子オーバーロードで
 
     sort(_nodes.begin(), _nodes.end());
@@ -58,7 +59,7 @@ void Network::buildNetwork()
     {
         cout << _nodes[i]->getId() << endl;
     }
-
+    */
     //初期の電力,振幅,位相の設定
     for (int i = 0; i < _power.size()-1; i++)
     {

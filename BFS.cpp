@@ -20,9 +20,18 @@ BFS::BFS(const vector<Node*>& nodes, const DVEC& R, const DVEC& X): _R(R), _X(X)
 //======================================================================
 void BFS::CalcLoop()
 {
+    for (int i = _nodes.size()-1; i < 0; i--)
+    {
+        if (_nodes[i]->getParentNode() == 0)
+        {
+            Node& _beginNode = _nodes[i];
+            break;
+        }
+    }
+
     while (true)
     {
-        ForwardSweep();
+        ForwardSweep(_beginNode);
         BackwardSweep();
 
         if (!isConvergence())
@@ -33,7 +42,7 @@ void BFS::CalcLoop()
 }
 
 //======================================================================
-void BFS::ForwardSweep()
+void BFS::ForwardSweep(Node& _beginNode)
 {
 
 }
