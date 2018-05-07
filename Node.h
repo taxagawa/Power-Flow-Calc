@@ -19,6 +19,8 @@ public:
     int getParentNode() const;
 
     //childNodes
+    void setChildNodes(const int& id);
+
     std::vector<int> getChildNodes() const;
 
     //activePower
@@ -60,7 +62,7 @@ protected:
     int _parentNode;
 
     //子ノードのidを格納
-    std::vector<int> _childNodes;
+    std::vector<int> childNodes;
 
     //有効電力
     double _activePower;

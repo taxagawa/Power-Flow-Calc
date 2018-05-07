@@ -91,7 +91,7 @@ void Network::buildNetwork()
             }
             else if (_nodes[j]->getParentNode() == _nodes[i]->getId())
             {
-                _nodes[i]->getChildNodes().push_back(_nodes[j]->getId());
+                _nodes[i]->setChildNodes(_nodes[j]->getId());
             }
         }
     }

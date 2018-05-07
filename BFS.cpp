@@ -20,9 +20,12 @@ BFS::BFS(const vector<Node*>& nodes, const DVEC& R, const DVEC& X): _R(R), _X(X)
 //======================================================================
 void BFS::CalcLoop()
 {
+    cout << "aaaa" << endl;
     int beginId;
     for (int i = _nodes.size()-1; i < 0; i--)
     {
+        cout << "a" << endl;
+        cout << _nodes[i]->getParentNode() << endl;
         if (_nodes[i]->getParentNode() == 0)
         {
             beginId = i;
@@ -30,14 +33,17 @@ void BFS::CalcLoop()
         }
     }
 
-    vector<Node*> _pNodes;
+    vector<Node*> pNodes;
     for (int i = 0; i < _nodes.size(); i++)
     {
         //子ノードを持つが孫ノードを持たないノードを格納
         //これらはBackward計算のスタートのノードとなる
-        if (hasChild(_nodes[i]) && !(hasGrandchild(_nodes[i])))
+        if (hasChild(_nodes[i]))
         {
-            _pNodes.push_back(_nodes[i]);
+            if (!(hasGrandchild(_nodes[i])))
+            {
+                pNodes.push_back(_nodes[i]);
+            }
         }
     }
 
@@ -48,7 +54,7 @@ void BFS::CalcLoop()
         step++;
 
         ForwardSweep(beginId);
-        BackwardSweep(_pNodes);
+        BackwardSweep(pNodes);
 
         if (!isConvergence())
         {
@@ -89,16 +95,14 @@ bool BFS::hasChild(const Node* node) const
 bool BFS::hasGrandchild(const Node* node) const
 {
     //debug
-    cout << node->getId() << endl;
+    //cout << node->getId() << endl;
 
     //子ノードを持つ前提で使用
     vector<int>::const_iterator itEnd = node->getChildNodes().end();
 
     for (vector<int>::const_iterator ite = node->getChildNodes().begin(); ite != itEnd; ++ite)
     {
-        //debug
         cout << *ite << endl;
-
         if (!(hasChild(_nodes[*ite])))
         {
             return false;

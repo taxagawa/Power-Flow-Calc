@@ -1,5 +1,6 @@
 #include "Node.h"
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -34,9 +35,15 @@ int Node::getParentNode() const
 }
 
 //======================================================================
+void Node::setChildNodes(const int& id)
+{
+    this->childNodes.push_back(id);
+}
+
+//======================================================================
 std::vector<int> Node::getChildNodes() const
 {
-    return _childNodes;
+    return this->childNodes;
 }
 
 //======================================================================
