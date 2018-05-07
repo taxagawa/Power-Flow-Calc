@@ -14,16 +14,19 @@ public:
 
 private:
     //フォワード計算
-    void ForwardSweep();
+    void ForwardSweep(int beginId);
 
     //バックワード計算
-    void BackwardSweep();
+    void BackwardSweep(std::vector<Node*> _pNodes);
 
     //収束判定
     bool isConvergence();
 
     //子ノードを持つか
     bool hasChild(const Node* node) const;
+
+    //孫ノードを持つか
+    bool hasGrandchild(const Node* node) const;
 
 private:
     std::vector<Node*> _nodes;

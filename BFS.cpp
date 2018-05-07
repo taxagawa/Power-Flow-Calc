@@ -20,19 +20,35 @@ BFS::BFS(const vector<Node*>& nodes, const DVEC& R, const DVEC& X): _R(R), _X(X)
 //======================================================================
 void BFS::CalcLoop()
 {
+    int beginId;
     for (int i = _nodes.size()-1; i < 0; i--)
     {
         if (_nodes[i]->getParentNode() == 0)
         {
-            Node& _beginNode = _nodes[i];
+            beginId = i;
             break;
         }
     }
 
+    vector<Node*> _pNodes;
+    for (int i = 0; i < _nodes.size(); i++)
+    {
+        //子ノードを持つが孫ノードを持たないノードを格納
+        //これらはBackward計算のスタートのノードとなる
+        if (hasChild(_nodes[i]) && !(hasGrandchild(_nodes[i])))
+        {
+            _pNodes.push_back(_nodes[i]);
+        }
+    }
+
+    int step = 1;
     while (true)
     {
-        ForwardSweep(_beginNode);
-        BackwardSweep();
+        cout << "Calculation Step: " << step << endl;
+        step++;
+
+        ForwardSweep(beginId);
+        BackwardSweep(_pNodes);
 
         if (!isConvergence())
         {
@@ -42,31 +58,21 @@ void BFS::CalcLoop()
 }
 
 //======================================================================
-void BFS::ForwardSweep(Node& _beginNode)
+void BFS::ForwardSweep(int beginId)
 {
 
 }
 
 //======================================================================
-void BFS::BackwardSweep()
+void BFS::BackwardSweep(vector<Node*> _pNodes)
 {
-    vector<Node*> _pNodes;
-
-    for (int i = 0; i < _nodes.size(); i++)
-    {
-        if (hasChild(_nodes[i]))
-        {
-            _pNodes.push_back(_nodes[i]);
-        }
-    }
-
 
 }
 
 //======================================================================
 bool BFS::isConvergence()
 {
-
+    return false;
 }
 
 //======================================================================
@@ -75,6 +81,28 @@ bool BFS::hasChild(const Node* node) const
     if (node->getChildNodes().size() == 0)
     {
         return false;
+    }
+    return true;
+}
+
+//======================================================================
+bool BFS::hasGrandchild(const Node* node) const
+{
+    //debug
+    cout << node->getId() << endl;
+
+    //子ノードを持つ前提で使用
+    vector<int>::const_iterator itEnd = node->getChildNodes().end();
+
+    for (vector<int>::const_iterator ite = node->getChildNodes().begin(); ite != itEnd; ++ite)
+    {
+        //debug
+        cout << *ite << endl;
+
+        if (!(_nodes[*ite]->hasChild()))
+        {
+            return false;
+        }
     }
     return true;
 }
