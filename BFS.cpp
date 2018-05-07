@@ -99,7 +99,7 @@ bool BFS::hasGrandchild(const Node* node) const
         //debug
         cout << *ite << endl;
 
-        if (!(_nodes[*ite]->hasChild()))
+        if (!(hasChild(_nodes[*ite])))
         {
             return false;
         }
