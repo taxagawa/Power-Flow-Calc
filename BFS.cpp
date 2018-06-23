@@ -8,7 +8,7 @@ using namespace std;
 
 namespace
 {
-    const double IVAL = 2.2943E-11;
+    const double EPS = 2.2943E-11;
 }
 
 //======================================================================
@@ -20,12 +20,12 @@ BFS::BFS(const vector<Node*>& nodes, const DVEC& R, const DVEC& X): _R(R), _X(X)
 //======================================================================
 void BFS::CalcLoop()
 {
-    cout << "aaaa" << endl;
+    //cout << "a1" << endl;
     int beginId;
-    for (int i = _nodes.size()-1; i < 0; i--)
+
+    for (int i = _nodes.size()-1; i >= 0; i--)
     {
-        cout << "a" << endl;
-        cout << _nodes[i]->getParentNode() << endl;
+        //begin nodeが複数ある場合は修正が必要
         if (_nodes[i]->getParentNode() == 0)
         {
             beginId = i;
@@ -43,6 +43,7 @@ void BFS::CalcLoop()
             if (!(hasGrandchild(_nodes[i])))
             {
                 pNodes.push_back(_nodes[i]);
+                //cout << _nodes[i]->getId() << endl;
             }
         }
     }
@@ -56,7 +57,7 @@ void BFS::CalcLoop()
         ForwardSweep(beginId);
         BackwardSweep(pNodes);
 
-        if (!isConvergence())
+        if (isConvergence())
         {
             break;
         }
@@ -66,6 +67,14 @@ void BFS::CalcLoop()
 //======================================================================
 void BFS::ForwardSweep(int beginId)
 {
+    vector<int> id;
+
+    id.push_back(beginId);
+
+    while (id.size() != 0)
+    {
+        
+    }
 
 }
 
@@ -78,7 +87,7 @@ void BFS::BackwardSweep(vector<Node*> _pNodes)
 //======================================================================
 bool BFS::isConvergence()
 {
-    return false;
+    return true;
 }
 
 //======================================================================
@@ -95,18 +104,31 @@ bool BFS::hasChild(const Node* node) const
 bool BFS::hasGrandchild(const Node* node) const
 {
     //debug
-    //cout << node->getId() << endl;
+    //cout << node->getId() << ":";
+
+    int p = 0;
+    int q = node->getChildNodes().size();
+    //cout << "q:" << q << " ";
 
     //子ノードを持つ前提で使用
     vector<int>::const_iterator itEnd = node->getChildNodes().end();
 
     for (vector<int>::const_iterator ite = node->getChildNodes().begin(); ite != itEnd; ++ite)
     {
-        cout << *ite << endl;
-        if (!(hasChild(_nodes[*ite])))
+        //cout << *ite << ",";
+        if (!(hasChild(_nodes[*ite-1])))
         {
-            return false;
+            p++;
         }
     }
-    return true;
+
+    //cout << " p:" << p << endl;
+    if (p == q)
+    {
+        return false;
+    } 
+    else 
+    {
+        return true;
+    }
 }

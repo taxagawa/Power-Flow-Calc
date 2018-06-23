@@ -69,7 +69,7 @@ void Network::buildNetwork()
             {
                 if (_nodes[j]->getId() == Utility::strtoi(_power[i][0]))
                 {
-                    _nodes[j]->setActivePower( Utility::strtod(_power[i][1]));
+                    _nodes[j]->setActivePower(Utility::strtod(_power[i][1]));
                     _nodes[j]->setReactivePower(Utility::strtod(_power[i][2]));
 
                     _nodes[j]->setAmplitude(Utility::distance(_nodes[j]->getActivePower(), _nodes[j]->getReactivePower()));

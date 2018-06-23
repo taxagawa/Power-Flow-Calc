@@ -3,6 +3,7 @@
 #include "FileIO.h"
 #include "Network.h"
 #include "Utility.h"
+#include <iostream>
 #include <string>
 
 using namespace std;
