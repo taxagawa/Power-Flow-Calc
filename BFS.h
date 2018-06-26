@@ -13,11 +13,11 @@ public:
     void CalcLoop();
 
 private:
-    //フォワード計算
+    //Forward計算
     void ForwardSweep(int beginId);
 
-    //バックワード計算
-    void BackwardSweep(std::vector<Node*> _pNodes);
+    //Backward計算
+    void BackwardSweep(std::vector<int> _pNodeIdx);
 
     //収束判定
     bool isConvergence();
@@ -27,6 +27,8 @@ private:
 
     //孫ノードを持つか
     bool hasGrandchild(const Node* node) const;
+
+    void returnEndPoints(std::vector<int>& tmpNodes, std::vector<Node*> nodes);
 
 private:
     std::vector<Node*> _nodes;

@@ -1,4 +1,5 @@
 GCC = g++
+#C11 = c++11
 PROGRAM = power
 
 OBJ =	main.o \
@@ -13,7 +14,7 @@ OBJ =	main.o \
 all : $(PROGRAM)
 
 $(PROGRAM) : $(OBJ)
-		$(GCC) -o $@ $(OBJ)
+		$(GCC) -o $@ $(OBJ) #--std=
 
 .PHONY : .o .cpp
 .cpp.o :

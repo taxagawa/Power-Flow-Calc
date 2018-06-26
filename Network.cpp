@@ -48,7 +48,9 @@ void Network::buildNetwork()
 
         //debug
         //cout << _node->getId() << endl;
+        //cout << _node->getParentNode() << endl;
     }
+
     /*
     //一応idでソートしようとしたが、なぜか正しくソートされないので放置
     //第三引数にラムダ式を書いてもokらしいがコンパイルできるかわからんので一応演算子オーバーロードで

@@ -25,13 +25,13 @@ BFSCalc::~BFSCalc()
 void BFSCalc::dataSetting(int argc, char** argv)
 {
     _fileIO->setData(argc, argv);
-
+    
     _linkInfo  = _fileIO->getLinkInfo();
     _initPower = _fileIO->getInitPower();
-
+    
     Network* _network = new Network(_linkInfo, _initPower);
     _network->buildNetwork();
-
+    
     _nodes = _network->getNodes();
     _R     = _network->getR();
     _X     = _network->getX();

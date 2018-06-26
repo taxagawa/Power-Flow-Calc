@@ -38,6 +38,11 @@ public:
 
     double getAmplitude() const;
 
+    //preAmplitude
+    void setPreAmplitude(double preAmplitude);
+
+    double getPreAmplitude() const;
+
     //angle
     void setAngle(double angle);
 

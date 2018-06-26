@@ -43,7 +43,7 @@ void Node::setChildNodes(const int& id)
 //======================================================================
 std::vector<int> Node::getChildNodes() const
 {
-    return this->childNodes;
+    return childNodes;
 }
 
 //======================================================================
@@ -80,6 +80,18 @@ void Node::setAmplitude(double amplitude)
 double Node::getAmplitude() const
 {
     return _amplitude;
+}
+
+//======================================================================
+void Node::setPreAmplitude(double preAmplitude)
+{
+    _preAmplitude = preAmplitude;
+}
+
+//======================================================================
+double Node::getPreAmplitude() const
+{
+    return _preAmplitude;
 }
 
 //======================================================================
