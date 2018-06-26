@@ -2,4 +2,4 @@
 
 ## TODO
 * change the type of Q and R to complex
-* modify BackwardSweep()
+* modify BackwardSweep() function
