@@ -75,7 +75,7 @@ void Network::buildNetwork()
                     _nodes[j]->setReactivePower(Utility::strtod(_power[i][2]));
 
                     _nodes[j]->setAmplitude(Utility::distance(_nodes[j]->getActivePower(), _nodes[j]->getReactivePower()));
-                    _nodes[j]->setAngle(atan2(_nodes[j]->getActivePower(), _nodes[j]->getReactivePower()));
+                    _nodes[j]->setAngle(atan2(_nodes[j]->getReactivePower(), _nodes[j]->getActivePower()));
                     break;
                 }
             }

@@ -28,10 +28,20 @@ public:
 
     double getActivePower() const;
 
+    //preActivePower
+    void setPreActivePower(double preActivePower);
+
+    double getPreActivePower() const;
+
     //reactivePower
     void setReactivePower(double reactivePower);
 
     double getReactivePower() const;
+
+    //preReactivePower
+    void setPreReactivePower(double preReactivePower);
+
+    double getPreReactivePower() const;
 
     //amplitude
     void setAmplitude(double amplitude);
@@ -72,8 +82,14 @@ protected:
     //有効電力
     double _activePower;
 
+    //k-1ステップ目の有効電力
+    double _preActivePower;
+
     //無効電力
     double _reactivePower;
+
+    //k-1ステップ目の無効電力
+    double _preReactivePower;
 
     //振幅
     double _amplitude;

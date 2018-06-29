@@ -8,13 +8,19 @@
 
 using namespace std;
 
+#ifndef M_PI
+#define M_PI 3.14159265358979
+#endif
+
+#define rad_to_deg(rad) (((rad)/M_PI)*180)
+
 namespace
 {
     const double EPS = 2.2943E-11;
 }
 
 //======================================================================
-BFS::BFS(const vector<Node*>& nodes, const DVEC& R, const DVEC& X): _R(R), _X(X)
+BFS::BFS(const vector<Node*>& nodes, const DVEC& R, const DVEC& X): _R(R), _X(X), step(1)
 {
     _nodes = nodes;
 }
@@ -37,23 +43,37 @@ void BFS::CalcLoop()
 
     //子ノードを持つが孫ノードを持たないノードを格納
     //これらはBackward計算のスタートのノードとなる
-    vector<int> pNodeIdx;
-    returnEndPoints(pNodeIdx, _nodes);
-    //cout<< "a" << endl;
-    //debug
-    /*
-    cout << "size: " << pNodeIdx.size() << endl;
-    for (int i = 0; i < pNodeIdx.size(); i++)
+    int endId;
+    for (int i = 0; i < _nodes.size(); i++)
     {
-        cout << pNodeIdx[i] << endl;
+        //適当に端点を一つ取得
+        if (!hasChild(_nodes[i]))
+        {
+            endId = i + 1;
+            break;
+        }
     }
-    */
-    int step = 1;
+
+    _nodes[beginId-1]->setActivePower(0.5);
+    _nodes[beginId-1]->setReactivePower(0.0);
+
     while (true)
     {
-        cout << "Calculation Step: " << step << endl;
-        step++;
+        cout << "*********************************************************" << endl;
+        cout << "*Calculation Step: " << step << endl;
+        cout << "*********************************************************" << endl;
 
+        BackwardSweep(endId);
+        /*
+        for (int i = 0; i < _nodes.size(); i++)
+        {
+            cout << "id:" << _nodes[i]->getId();
+            cout << " preA:" << _nodes[i]->getPreActivePower();
+            cout << " A:" << _nodes[i]->getActivePower();
+            cout << " preR:" << _nodes[i]->getPreReactivePower();
+            cout << " R:" << _nodes[i]->getReactivePower() << endl;;
+        }
+        */
         ForwardSweep(beginId);
 
         if (isConvergence() || step == 100)
@@ -61,7 +81,7 @@ void BFS::CalcLoop()
             break;
         }
 
-        BackwardSweep(pNodeIdx);
+        step++;
     }
 }
 
@@ -134,122 +154,163 @@ void BFS::ForwardSweep(int beginId)
         {
             _nodes[id-1]->setAmplitude(1.05);
             _nodes[id-1]->setAngle(0.0);
+
+            _nodes[id-1]->setActivePower(_nodes[id-1]->getAmplitude() * cos(_nodes[id-1]->getAngle()));
+            _nodes[id-1]->setReactivePower(_nodes[id-1]->getAmplitude() * sin(_nodes[id-1]->getAngle()));
+            //cout << "active:" << _nodes[id-1]->getActivePower() << " reactive:" << _nodes[id-1]->getReactivePower() << endl; 
+            cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl; 
             continue;
         }
 
-        int parentNodeIdx = _nodes[id-1]->getParentNode()-1;
+        int parentNodeIdx = (_nodes[id-1]->getParentNode())-1;
         complex<double> imag(0.0, 1.0);
         //forward計算
-        double parentP = _nodes[parentNodeIdx]->getAmplitude() * cos(_nodes[parentNodeIdx]->getAngle());
-        double parentQ = _nodes[parentNodeIdx]->getAmplitude() * sin(_nodes[parentNodeIdx]->getAngle());
-        //親ノードの電圧（複素数）
-        complex<double> parentV(parentP, parentQ);
+        //double parentP = _nodes[parentNodeIdx]->getAmplitude() * cos(_nodes[parentNodeIdx]->getAngle());
+        //complex<double> parentQ(0.0, _nodes[parentNodeIdx]->getAmplitude() * sin(_nodes[parentNodeIdx]->getAngle()));
+        double parentP = _nodes[parentNodeIdx]->getActivePower();
+        complex<double> parentQ(0.0, _nodes[parentNodeIdx]->getReactivePower());
+        //親ノードの電圧
+        //complex<double> tmp0 = parentQ * imag; 
+        double parentV = _nodes[parentNodeIdx]->getAmplitude();
         //cout << parentV << endl;
-        //_Rと_Xだけはindexではなくidで管理
-        complex<double> tmp1 = 1.0 - (((_nodes[parentNodeIdx]->getActivePower() * _R[id][parentNodeIdx+1])
-                                + (_nodes[parentNodeIdx]->getReactivePower() * _X[id][parentNodeIdx+1])) / pow(parentV, 2.0));
-        complex<double> tmp2 = ((_nodes[parentNodeIdx]->getReactivePower() * _R[id][parentNodeIdx+1])
-                                - (_nodes[parentNodeIdx]->getActivePower() * _X[id][parentNodeIdx+1])) / pow(parentV, 2.0);
+        complex<double> X(0.0, _X[id][parentNodeIdx+1]);
+        //_Rと_Xはindexではなくidで管理
+        complex<double> tmp1 = 1.0 - (((parentP * _R[id][parentNodeIdx+1])
+                                + (parentQ * X)) / (parentV * parentV));
+        complex<double> tmp2 = (((parentQ * _R[id][parentNodeIdx+1])
+                                - (parentP * X)) * imag) / (parentV * parentV);
 
-        complex<double> tmp3 = tmp1 + tmp2 * imag;
-        //電圧（複素数）
-        complex<double> vol = parentV * tmp3;
+        complex<double> tmp3 = tmp1 + tmp2;
+        //電圧
+        double vol = parentV * tmp3.real();
 
-        _nodes[id-1]->setAmplitude(abs(vol));
-        _nodes[id-1]->setAngle(arg(vol));
-        //cout << "amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << _nodes[id-1]->getAngle() << endl;
+        _nodes[id-1]->setAmplitude(vol);
+        _nodes[id-1]->setAngle(atan2(_nodes[id-1]->getReactivePower(), _nodes[id-1]->getActivePower()));
+        cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;        
         }
-
 }
 
 //======================================================================
-void BFS::BackwardSweep(vector<int> _pNodeIdx)
+void BFS::BackwardSweep(int id)
 {
-    vector<Node*> tmpNodes = _nodes;
-
-    for (int i = 0; i < _pNodeIdx.size(); i++)
+    //探索済みノードを判別するための配列
+    //0が未探索で、1が探索済み
+    //idで管理
+    int visited[_nodes.size()+1];
+    for (int i = 0; i < _nodes.size()+1; i++)
     {
-        int index = _pNodeIdx[i];
+        visited[i] = 0;
+    }
+    //必要あるかわからないけどコピーする
+    int endId = id;
 
-        vector<int>::const_iterator itEnd = _nodes[index]->getChildNodes().end();
-        for (vector<int>::const_iterator ite = _nodes[index]->getChildNodes().begin(); ite != itEnd; ite++)
+    DFS(endId, visited);
+}
+
+//======================================================================
+void BFS::DFS(int id, int visited[])
+{
+    //cout << "***********     id:" << id << "     ***********" << endl;
+    //親ノードのID
+    int parent = _nodes[id-1]->getParentNode();
+    //終了条件
+    if (id == 0)
+    {
+        return;
+    }
+
+    //まず端点かどうかをチェック
+    if (!hasChild(_nodes[id-1]))
+    {
+        //_nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
+        //_nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
+        visited[id] = 1;
+        DFS(parent, visited);
+    }
+    //次に子ノードがすべて訪問済みかどうかをチェック
+    else if (!checkChildrenVisited(id, visited))
+    {
+        vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
+        for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ite++)
         {
-            int j = *ite - 1;
-            _nodes[j]->setActivePower(_nodes[j]->getAmplitude() * cos(_nodes[j]->getAngle()));
-            _nodes[j]->setReactivePower(_nodes[j]->getAmplitude() * sin(_nodes[j]->getAngle()));
+            if (visited[*ite] == 1)
+            {
+                continue;
+            }
+
+            DFS(*ite, visited);
         }
     }
-    
-    while (_pNodeIdx.size() != 0)
+    //それ以外
+    else
     {
-        while (_pNodeIdx.size() != 0)
-        {
-            int index = _pNodeIdx[0];
-            //cout << "id:" << index+1 << endl;
-            //終了条件
-            if (index == 125)
-            {
-                break;
-            }
-            //cout << _pNodeIdx.size() << endl;
-            //先頭を削除すると要素の移動で無駄な計算時間が発生するので、reverseを用いることで計算量をO(1)に落とす
-            reverse(_pNodeIdx.begin(), _pNodeIdx.end());
-            _pNodeIdx.pop_back();
-            //元に戻す
-            reverse(_pNodeIdx.begin(), _pNodeIdx.end());
+        //_nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
+        //_nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
 
-            //debug
-            /*
-            vector<int>::const_iterator itEnd12 = _pNodeIdx.end();
-            for (vector<int>::const_iterator ite = _pNodeIdx.begin(); ite != itEnd12; ite++)
+        double active   = 0.0;
+        double reactive = 0.0;
+        complex<double> imag(0.0, 1.0);
+
+        vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
+        for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ite++)
+        {
+            double P = _nodes[*ite-1]->getActivePower();
+            complex<double> Q(0.0, _nodes[*ite-1]->getReactivePower());
+
+            double R = _R[id][*ite];
+            complex<double> X(0.0, _X[id][*ite]);
+
+            double V;
+            //complex<double> tmp = Q * imag;
+            //double V = _nodes[*ite-1]->getAmplitude();
+            if (step == 1)
             {
-                cout << *ite << endl;
+                V = Utility::distance(P, _nodes[*ite-1]->getReactivePower());
             }
-            */
-            int step = 0;
-            int size = _nodes[index]->getChildNodes().size();
+            else
+            {
+                V = _nodes[*ite-1]->getAmplitude();
+            }
             
-            //double active   = 0.0;
-            //double reactive = 0.0;
-            complex<double> active(0.0, 0.0);
-            complex<double> reactive(0.0, 0.0);
-            //Backward計算
-            vector<int>::const_iterator itEnd = _nodes[index]->getChildNodes().end();
-            for (vector<int>::const_iterator ite = _nodes[index]->getChildNodes().begin(); ite != itEnd; ite++)
-            {
-                //cout << *ite << endl;
-                step++;
-                double P = _nodes[*ite-1]->getActivePower();
-                double Q = _nodes[*ite-1]->getReactivePower();
-                complex<double> V(P, Q);
+            complex<double> cActive(0.0, 0.0);
+            cActive   = P + ((R * ((P * P) + (Q * Q))) / (V * V));
+            active   += cActive.real();
 
-                active   += P + ((_R[*ite][index+1] * (P * P + Q * Q)) / pow(V, 2));
-                reactive += Q + ((_X[*ite][index+1] * (P * P + Q * Q)) / pow(V, 2));
+            complex<double> cReactive(0.0, 0.0); 
+            cReactive = Q + ((X * ((P * P) + (Q * Q))) / (V * V));
 
-                if (step == size)
-                {
-                    _nodes[index]->setActivePower(abs(active));
-                    _nodes[index]->setReactivePower(abs(reactive));
-                }
-            }
-
-            //cout << "a" << endl;
-            tmpNodes[index]->getChildNodes().pop_back();
-            //tmpNodes[index]->getChildNodes().shrink_to_fit();
-            //debug
-            /*
-            vector<int>::const_iterator itEnd11 = tmpNodes[index]->getChildNodes().end();
-            for (vector<int>::const_iterator ite = tmpNodes[index]->getChildNodes().begin(); ite != itEnd11; ite++)
-            {
-                cout << *ite << endl;
-            }
-            */
-            //cout << "size: " << tmpNodes[index]->getChildNodes().size() << endl;;
+            reactive += cReactive.imag(); 
+            //cout << "P:" << P << " Q:" << Q << " R:" << R << " X:" << X << " tmp:" << tmp << " V:" << V << endl;
+            //cout << "cActive:" << cActive << " cReactive:" << cReactive << endl;
         }
-        
-        returnEndPoints(_pNodeIdx, tmpNodes);
-        cout << "b" << endl;
+        //cout << "id:" << id << " active:" << active << " reactive:" << reactive << endl;
+
+        _nodes[id-1]->setActivePower(active);
+        _nodes[id-1]->setReactivePower(reactive);
+
+        //_nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
+        //_nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
+
+        visited[id] = 1;
+        DFS(parent, visited);
+
+        //次はstep数でVの値をわける
     }
+}
+
+//======================================================================
+bool BFS::checkChildrenVisited(int id, int visited[])
+{
+    vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
+    for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ite++)
+    {
+        if (visited[*ite] == 0)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 //======================================================================
@@ -277,6 +338,7 @@ bool BFS::hasChild(const Node* node) const
 }
 
 //======================================================================
+/*
 bool BFS::hasGrandchild(const Node* node) const
 {
     //debug
@@ -308,19 +370,4 @@ bool BFS::hasGrandchild(const Node* node) const
         return true;
     }
 }
-
-//======================================================================
-void BFS::returnEndPoints(vector<int>& tmpNodes, const vector<Node*> nodes)
-{
-    for (int i = 0; i < nodes.size(); i++)
-    {
-        if (hasChild(nodes[i]))
-        {
-            if (!(hasGrandchild(nodes[i])))
-            {
-                tmpNodes.push_back(nodes[i]->getId()-1);
-                //cout << nodes[i]->getId()-1 << endl;
-            }
-        }
-    }
-}
+*/

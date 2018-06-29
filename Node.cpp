@@ -7,10 +7,12 @@ using namespace std;
 //======================================================================
 Node::Node(int id)
 {
-    _id         = id;
+    _id = id;
 
-    _activePower   = 0.0;
-    _reactivePower = 0.0;
+    _activePower      = 0.0;
+    _preActivePower   = 0.0;
+    _reactivePower    = 0.0;
+    _preReactivePower = 0.0;
 
     _amplitude = 0.0;
     _angle     = 0.0;
@@ -59,6 +61,18 @@ double Node::getActivePower() const
 }
 
 //======================================================================
+void Node::setPreActivePower(double preActivePower)
+{
+    _preActivePower = preActivePower;
+}
+
+//======================================================================
+double Node::getPreActivePower() const
+{
+    return _preActivePower;
+}
+
+//======================================================================
 void Node::setReactivePower(double reactivePower)
 {
     _reactivePower = reactivePower;
@@ -68,6 +82,18 @@ void Node::setReactivePower(double reactivePower)
 double Node::getReactivePower() const
 {
     return _reactivePower;
+}
+
+//======================================================================
+void Node::setPreReactivePower(double preReactivePower)
+{
+    _preReactivePower = preReactivePower;
+}
+
+//======================================================================
+double Node::getPreReactivePower() const
+{
+    return _preReactivePower;
 }
 
 //======================================================================

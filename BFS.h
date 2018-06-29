@@ -17,7 +17,13 @@ private:
     void ForwardSweep(int beginId);
 
     //Backward計算
-    void BackwardSweep(std::vector<int> _pNodeIdx);
+    void BackwardSweep(int id);
+
+    //深さ優先探索
+    void DFS(int id, int visited[]);
+
+    //子ノードが訪問済みかどうかを調べる
+    bool checkChildrenVisited(int id, int visited[]);
 
     //収束判定
     bool isConvergence();
@@ -26,9 +32,7 @@ private:
     bool hasChild(const Node* node) const;
 
     //孫ノードを持つか
-    bool hasGrandchild(const Node* node) const;
-
-    void returnEndPoints(std::vector<int>& tmpNodes, std::vector<Node*> nodes);
+    //bool hasGrandchild(const Node* node) const;
 
 private:
     std::vector<Node*> _nodes;
@@ -36,6 +40,8 @@ private:
     const DVEC _R;
 
     const DVEC _X;
+
+    int step;
 };
 
 #endif //__BFS_H__
