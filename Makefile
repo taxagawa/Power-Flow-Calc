@@ -6,7 +6,6 @@ OBJ =	main.o \
 		BFS.o \
 		BFSCalc.o \
 		FileIO.o \
-		Network.o \
 		Node.o \
 		Utility.o
 
@@ -14,7 +13,7 @@ OBJ =	main.o \
 all : $(PROGRAM)
 
 $(PROGRAM) : $(OBJ)
-		$(GCC) -o $@ $(OBJ) #--std=
+		$(GCC) -Wall -g -o $@ $(OBJ)
 
 .PHONY : .o .cpp
 .cpp.o :

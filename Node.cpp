@@ -9,10 +9,14 @@ Node::Node(int id)
 {
     _id = id;
 
-    _activePower      = 0.0;
-    _preActivePower   = 0.0;
-    _reactivePower    = 0.0;
-    _preReactivePower = 0.0;
+    _activePower    = 0.0;
+    _dActivePower   = 0.0;
+    _pActivePower   = 0.0;
+    _reactivePower  = 0.0;
+    _dReactivePower = 0.0;
+    _pReactivePower = 0.0;
+
+    childNodes.reserve(50);
 
     _amplitude = 0.0;
     _angle     = 0.0;
@@ -61,15 +65,27 @@ double Node::getActivePower() const
 }
 
 //======================================================================
-void Node::setPreActivePower(double preActivePower)
+void Node::setDefaultActivePower(double dActivePower)
 {
-    _preActivePower = preActivePower;
+    _dActivePower = dActivePower;
+}
+
+//======================================================================
+double Node::getDefaultActivePower() const
+{
+    return _dActivePower;
+}
+
+//======================================================================
+void Node::setPreActivePower(double pActivePower)
+{
+    _pActivePower = pActivePower;
 }
 
 //======================================================================
 double Node::getPreActivePower() const
 {
-    return _preActivePower;
+    return _pActivePower;
 }
 
 //======================================================================
@@ -85,15 +101,27 @@ double Node::getReactivePower() const
 }
 
 //======================================================================
-void Node::setPreReactivePower(double preReactivePower)
+void Node::setDefaultReactivePower(double dReactivePower)
 {
-    _preReactivePower = preReactivePower;
+    _dReactivePower = dReactivePower;
+}
+
+//======================================================================
+double Node::getDefaultReactivePower() const
+{
+    return _dReactivePower;
+}
+
+//======================================================================
+void Node::setPreReactivePower(double pReactivePower)
+{
+    _pReactivePower = pReactivePower;
 }
 
 //======================================================================
 double Node::getPreReactivePower() const
 {
-    return _preReactivePower;
+    return _pReactivePower;
 }
 
 //======================================================================

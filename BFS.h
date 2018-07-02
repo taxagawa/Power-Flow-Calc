@@ -3,14 +3,26 @@
 
 #include "Node.h"
 #include "Utility.h"
+#include <string>
+#include <vector>
 
 class BFS
 {
 public:
-    BFS(const std::vector<Node*>& nodes, const DVEC& R, const DVEC& X);
+    BFS(const SVEC& _linkInfo, const SVEC& _initPower);
 
     //計算する
     void CalcLoop();
+
+    //ノード・インピーダンスの設定
+    void buildNetwork();
+
+    //getter
+    std::vector<Node*> getNodes() const;
+
+    DVEC getR() const;
+
+    DVEC getX() const;
 
 private:
     //Forward計算
@@ -37,11 +49,17 @@ private:
 private:
     std::vector<Node*> _nodes;
 
-    const DVEC _R;
-
-    const DVEC _X;
-
     int step;
+
+    SVEC _link;
+
+    SVEC _power;
+
+    //レジスタンス行列
+    DVEC _R;
+
+    //リアクタンス行列
+    DVEC _X;
 };
 
 #endif //__BFS_H__

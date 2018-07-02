@@ -28,8 +28,13 @@ public:
 
     double getActivePower() const;
 
-    //preActivePower
-    void setPreActivePower(double preActivePower);
+    //dActivePower
+    void setDefaultActivePower(double dActivePower);
+
+    double getDefaultActivePower() const;
+
+    //pActivePower
+    void setPreActivePower(double pActivePower);
 
     double getPreActivePower() const;
 
@@ -38,8 +43,13 @@ public:
 
     double getReactivePower() const;
 
-    //preReactivePower
-    void setPreReactivePower(double preReactivePower);
+    //dReactivePower
+    void setDefaultReactivePower(double dReactivePower);
+
+    double getDefaultReactivePower() const;
+
+    //pReactivePower
+    void setPreReactivePower(double pReactivePower);
 
     double getPreReactivePower() const;
 
@@ -82,14 +92,20 @@ protected:
     //有効電力
     double _activePower;
 
-    //k-1ステップ目の有効電力
-    double _preActivePower;
+    //デフォルトの有効電力
+    double _dActivePower;
+
+    //1step前の有効電力
+    double _pActivePower;
 
     //無効電力
     double _reactivePower;
 
-    //k-1ステップ目の無効電力
-    double _preReactivePower;
+    //デフォルトの無効電力
+    double _dReactivePower;
+
+    //1step前の無効電力
+    double _pReactivePower;
 
     //振幅
     double _amplitude;
