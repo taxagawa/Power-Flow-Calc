@@ -117,7 +117,7 @@ void BFS::ForwardSweep(int beginId)
         for (vector<int>::iterator ite = _nodes[id-1]->getChildNodes().begin(); ite != itEnd1; ite++)
         {
             cout << *ite << ",";
-        }    
+        }
         cout << endl;
         */
         //番号がidのノードの子ノードベクトルをid_vecの末尾に接続
@@ -127,12 +127,12 @@ void BFS::ForwardSweep(int beginId)
         {
             if (id_vec.size() != 0)
             {
-                vector<int>::iterator itEnd = _nodes[id-1]->getChildNodes().end();
-                for (vector<int>::iterator ite = _nodes[id-1]->getChildNodes().begin(); ite != itEnd; ite++)
+                vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
+                for (vector<int>::const_iterator ite = _nodes[id-1]->getChildNodes().begin(); ite != itEnd; ite++)
                 {
                     //cout << *ite << ",";
                     id_vec.push_back(*ite);
-                }    
+                }
                 //ベクトルの連結をググると以下の二つが推奨されているが、実際はメモリ周りのバグが発生してしまった　なぜ
                 //id_vec.insert(id_vec.end(), _nodes[id-1]->getChildNodes().begin(), _nodes[id-1]->getChildNodes().end());
                 //copy(_nodes[id-1]->getChildNodes().begin(), _nodes[id-1]->getChildNodes().end(), back_inserter(id_vec));
@@ -163,8 +163,8 @@ void BFS::ForwardSweep(int beginId)
 
             //_nodes[id-1]->setActivePower(_nodes[id-1]->getAmplitude() * cos(_nodes[id-1]->getAngle()));
             //_nodes[id-1]->setReactivePower(_nodes[id-1]->getAmplitude() * sin(_nodes[id-1]->getAngle()));
-            //cout << "active:" << _nodes[id-1]->getActivePower() << " reactive:" << _nodes[id-1]->getReactivePower() << endl; 
-            cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl; 
+            //cout << "active:" << _nodes[id-1]->getActivePower() << " reactive:" << _nodes[id-1]->getReactivePower() << endl;
+            cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
             continue;
         }
 
@@ -176,7 +176,7 @@ void BFS::ForwardSweep(int beginId)
         double parentP = _nodes[parentNodeIdx]->getActivePower();
         complex<double> parentQ(0.0, _nodes[parentNodeIdx]->getReactivePower());
         //親ノードの電圧
-        //complex<double> tmp0 = parentQ * imag; 
+        //complex<double> tmp0 = parentQ * imag;
         double parentV = _nodes[parentNodeIdx]->getAmplitude();
         //cout << parentV << endl;
         complex<double> X(0.0, _X[id][parentNodeIdx+1]);
@@ -194,7 +194,7 @@ void BFS::ForwardSweep(int beginId)
 
         _nodes[id-1]->setAmplitude(vol);
         _nodes[id-1]->setAngle(atan2(_nodes[id-1]->getReactivePower(), _nodes[id-1]->getActivePower()));
-        cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;        
+        cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
         }
 }
 
@@ -295,13 +295,13 @@ void BFS::DFS(int id, int visited[])
             cActive   = P + ((R * ((P * P) + (Q * Q))) / (V * V));
             active   += cActive.real();
 
-            complex<double> cReactive(0.0, 0.0); 
+            complex<double> cReactive(0.0, 0.0);
             cReactive = Q + ((X * ((P * P) + (Q * Q))) / (V * V));
 
-            reactive += cReactive.imag(); 
+            reactive += cReactive.imag();
             //cout << "P:" << P << " Q:" << Q << " R:" << R << " X:" << X << " tmp:" << tmp << " V:" << V << endl;
             //cout << "cActive:" << cActive << " cReactive:" << cReactive << endl;
-            //cout << "active: " << active << " | reactive:" << reactive << endl; 
+            //cout << "active: " << active << " | reactive:" << reactive << endl;
         }
         //cout << "id:" << id << " active:" << active << " reactive:" << reactive << endl;
 
@@ -435,6 +435,12 @@ void BFS::buildNetwork()
                 _nodes[i]->setChildNodes(_nodes[j]->getId());
             }
         }
+        vector<int>::iterator itEnd1 = _nodes[i]->getChildNodes().end();
+        for (vector<int>::iterator ite = _nodes[i]->getChildNodes().begin(); ite != itEnd1; ++ite)
+        {
+            cout << *ite << ",";
+        }
+        cout << endl;
     }
 }
 
@@ -483,8 +489,8 @@ bool BFS::hasGrandchild(const Node* node) const
     if (p == q)
     {
         return false;
-    } 
-    else 
+    }
+    else
     {
         return true;
     }

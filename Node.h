@@ -10,6 +10,8 @@ public:
 
     //virtual ~Node();
 
+    Node(const Node &node);
+
     //getter & setter
     int getId() const;
 

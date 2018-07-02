@@ -16,10 +16,16 @@ Node::Node(int id)
     _dReactivePower = 0.0;
     _pReactivePower = 0.0;
 
-    childNodes.reserve(50);
+    childNodes.reserve(10);
 
     _amplitude = 0.0;
     _angle     = 0.0;
+}
+
+//======================================================================
+Node::Node(const Node &node):_id(node._id),_activePower(node._activePower),_dActivePower(node._dActivePower),_pActivePower(node._pActivePower),_reactivePower(node._reactivePower),_dReactivePower(node._dReactivePower),_pReactivePower(node._pReactivePower),_amplitude(node._amplitude),_angle(node._angle),childNodes(node.childNodes)
+{
+    cout << "COPY" << cout;
 }
 
 //======================================================================
