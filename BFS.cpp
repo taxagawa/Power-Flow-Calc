@@ -5,6 +5,7 @@
 #include <cmath>
 #include <complex>
 #include <iostream>
+#include <stack>
 #include <string>
 #include <vector>
 
@@ -16,7 +17,7 @@ using namespace std;
 
 #define rad_to_deg(rad) (((rad)/M_PI)*180)
 
-#define EPS 1.0E-11
+#define EPS 1.0E-8
 
 
 //======================================================================
@@ -47,8 +48,6 @@ void BFS::CalcLoop()
         }
     }
 
-    //子ノードを持つが孫ノードを持たないノードを格納
-    //これらはBackward計算のスタートのノードとなる
     int endId;
     for (int i = 0; i < _nodes.size(); i++)
     {
@@ -60,15 +59,12 @@ void BFS::CalcLoop()
         }
     }
 
-    _nodes[beginId-1]->setActivePower(0.5);
-    _nodes[beginId-1]->setReactivePower(0.0);
-
     while (true)
     {
         cout << "*********************************************************" << endl;
         cout << "*Calculation Step: " << step << endl;
         cout << "*********************************************************" << endl;
-
+        //単純に計算が多すぎてセグフォ出てるので、探索方法を変える
         BackwardSweep(endId);
         /*
         for (int i = 0; i < _nodes.size(); i++)
@@ -98,13 +94,12 @@ void BFS::ForwardSweep(int beginId)
     id_vec.reserve(_nodes.size());
 
     id_vec.push_back(beginId);
-    //cout << beginId << endl;
 
     while (id_vec.size() != 0)
     {
         int id = id_vec[0];
         //cout << "id:" << id << endl;
-        //先頭を削除すると要素の移動で無駄な計算時間が発生するので、reverseを用いることで計算量をO(1)に落とす
+        //先頭を削除すると要素の移動で無駄な計算時間が発生する
         reverse(id_vec.begin(), id_vec.end());
         id_vec.pop_back();
         //元に戻す
@@ -121,8 +116,6 @@ void BFS::ForwardSweep(int beginId)
         cout << endl;
         */
         //番号がidのノードの子ノードベクトルをid_vecの末尾に接続
-        //cout << id -1 << endl;
-        //cout << _nodes[id-1]->getId() << endl;
         if (_nodes[id-1]->getChildNodes().size() != 0)
         {
             if (id_vec.size() != 0)
@@ -133,9 +126,6 @@ void BFS::ForwardSweep(int beginId)
                     //cout << *ite << ",";
                     id_vec.push_back(*ite);
                 }
-                //ベクトルの連結をググると以下の二つが推奨されているが、実際はメモリ周りのバグが発生してしまった　なぜ
-                //id_vec.insert(id_vec.end(), _nodes[id-1]->getChildNodes().begin(), _nodes[id-1]->getChildNodes().end());
-                //copy(_nodes[id-1]->getChildNodes().begin(), _nodes[id-1]->getChildNodes().end(), back_inserter(id_vec));
             }
             else
             {
@@ -155,37 +145,31 @@ void BFS::ForwardSweep(int beginId)
         //収束判定のために、前ステップにおける振幅の値を_preAmplitudeに保存
         _nodes[id-1]->setPreAmplitude(_nodes[id-1]->getAmplitude());
 
-        //slack nodeはforward計算をしない
+        //slack nodeは計算をしない
         if (id == 126)
         {
             _nodes[id-1]->setAmplitude(1.05);
             _nodes[id-1]->setAngle(0.0);
 
-            //_nodes[id-1]->setActivePower(_nodes[id-1]->getAmplitude() * cos(_nodes[id-1]->getAngle()));
-            //_nodes[id-1]->setReactivePower(_nodes[id-1]->getAmplitude() * sin(_nodes[id-1]->getAngle()));
             //cout << "active:" << _nodes[id-1]->getActivePower() << " reactive:" << _nodes[id-1]->getReactivePower() << endl;
             cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
             continue;
         }
+        double base_angle = atan2(_nodes[beginId-1]->getReactivePower(), _nodes[beginId-1]->getActivePower());
 
         int parentNodeIdx = (_nodes[id-1]->getParentNode())-1;
         complex<double> imag(0.0, 1.0);
         //forward計算
-        //double parentP = _nodes[parentNodeIdx]->getAmplitude() * cos(_nodes[parentNodeIdx]->getAngle());
-        //complex<double> parentQ(0.0, _nodes[parentNodeIdx]->getAmplitude() * sin(_nodes[parentNodeIdx]->getAngle()));
         double parentP = _nodes[parentNodeIdx]->getActivePower();
         complex<double> parentQ(0.0, _nodes[parentNodeIdx]->getReactivePower());
         //親ノードの電圧
-        //complex<double> tmp0 = parentQ * imag;
         double parentV = _nodes[parentNodeIdx]->getAmplitude();
         //cout << parentV << endl;
         complex<double> X(0.0, _X[id][parentNodeIdx+1]);
         //cout << "X:" << X << endl;
         //_Rと_Xはindexではなくidで管理
-        complex<double> tmp1 = 1.0 - (((parentP * _R[id][parentNodeIdx+1])
-                                + (parentQ * X)) / (parentV * parentV));
-        complex<double> tmp2 = (((parentQ * _R[id][parentNodeIdx+1])
-                                + (parentP * X)) * imag) / (parentV * parentV);
+        complex<double> tmp1 = 1.0 - (((parentP * _R[id][parentNodeIdx+1]) + (parentQ * X)) / (parentV * parentV));
+        complex<double> tmp2 = (((parentQ * _R[id][parentNodeIdx+1]) + (parentP * X)) * imag) / (parentV * parentV);
 
         complex<double> tmp3 = tmp1 + tmp2;
         //cout << "tmp1:" << tmp1 << " tmp2:" << tmp2 << " tmp3:" << tmp3 << endl;
@@ -193,7 +177,8 @@ void BFS::ForwardSweep(int beginId)
         double vol = parentV * tmp3.real();
 
         _nodes[id-1]->setAmplitude(vol);
-        _nodes[id-1]->setAngle(atan2(_nodes[id-1]->getReactivePower(), _nodes[id-1]->getActivePower()));
+        _nodes[id-1]->setAngle(atan2(_nodes[id-1]->getReactivePower(), _nodes[id-1]->getActivePower()) - base_angle);
+        //cout << "id: " << id << " | active: " << _nodes[id-1]->getActivePower() << " | reactive: " << _nodes[id-1]->getReactivePower() << endl;
         cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
         }
 }
@@ -209,111 +194,102 @@ void BFS::BackwardSweep(int id)
     {
         visited[i] = 0;
     }
-    //必要あるかわからないけどコピーする
-    int endId = id;
 
-    DFS(endId, visited);
-}
+    stack<int> S;
+    S.push(id);
 
-//======================================================================
-void BFS::DFS(int id, int visited[])
-{
-    //cout << "***********     id:" << id << "     ***********" << endl;
-    //終了条件
-    if (id == 0)
+    while (!S.empty())
     {
-        return;
-    }
-    //親ノードのID
-    int parent = _nodes[id-1]->getParentNode();
-
-    //まず端点かどうかをチェック
-    if (!hasChild(_nodes[id-1]))
-    {
-        //cout << "***********     id:" << id << "     ***********" << endl;
-        _nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
-        _nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
-        visited[id] = 1;
-        DFS(parent, visited);
-    }
-    //次に子ノードがすべて訪問済みかどうかをチェック
-    else if (!checkChildrenVisited(id, visited))
-    {
-        vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
-        for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ++ite)
+        int nid = S.top();
+        //終了条件
+        if (nid == 0)
         {
-            if (visited[*ite] == 1)
-            {
-                continue;
-            }
-
-            DFS(*ite, visited);
+            break;
         }
-    }
-    /*
-    else if (id == 19 || id == 16 || id == 12 || id == 9 || id == 6 || id == 2 || id == 27)
-    {
-        //cout << "id:" << id << endl;
-        visited[id] = 1;
-        DFS(parent, visited);
-    }
-    */
-    //それ以外
-    else
-    {
-        _nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
-        _nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
-        //cout << "***********     id:" << id << "     ***********" << endl;
+        //cout << "***********     id:" << nid << "     ***********" << endl;
 
-        double active   = 0.0;
-        double reactive = 0.0;
-        complex<double> imag(0.0, 1.0);
-
-        vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
-        for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ++ite)
+        //親ノードのID
+        int parent = _nodes[nid-1]->getParentNode();
+        //cout << " parent:" << parent << endl;
+        //まず端点かどうかをチェック
+        if (!hasChild(_nodes[nid-1]))
         {
-            double P = _nodes[*ite-1]->getPreActivePower();
-            complex<double> Q(0.0, _nodes[*ite-1]->getPreReactivePower());
-
-            double R = _R[id][*ite];
-            complex<double> X(0.0, _X[id][*ite]);
-
-            double V;
-            //cout << "step:" << step << endl;
-            //complex<double> tmp = Q * imag;
-            //double V = _nodes[*ite-1]->getAmplitude();
-            if (step == 1)
-            {
-                V = 0.6;//Utility::distance(P, _nodes[*ite-1]->getReactivePower());
-            }
-            else
-            {
-                V = _nodes[*ite-1]->getAmplitude();
-            }
-            //cout << "V:" << V << endl;
-            complex<double> cActive(0.0, 0.0);
-            cActive   = P + ((R * ((P * P) + (Q * Q))) / (V * V));
-            active   += cActive.real();
-
-            complex<double> cReactive(0.0, 0.0);
-            cReactive = Q + ((X * ((P * P) + (Q * Q))) / (V * V));
-
-            reactive += cReactive.imag();
-            //cout << "P:" << P << " Q:" << Q << " R:" << R << " X:" << X << " tmp:" << tmp << " V:" << V << endl;
-            //cout << "cActive:" << cActive << " cReactive:" << cReactive << endl;
-            //cout << "active: " << active << " | reactive:" << reactive << endl;
+            _nodes[nid-1]->setPreActivePower(_nodes[nid-1]->getActivePower());
+            _nodes[nid-1]->setPreReactivePower(_nodes[nid-1]->getReactivePower());
+            visited[nid] = 1;
+            S.pop();
+            S.push(parent);
         }
-        //cout << "id:" << id << " active:" << active << " reactive:" << reactive << endl;
+        //次に子ノードがすべて訪問済みかどうかをチェック
+        else if (!checkChildrenVisited(nid, visited))
+        {
+            vector<int>::const_iterator itEnd = _nodes[nid-1]->getChildNodes().end();
+            for (vector<int>::const_iterator ite =_nodes[nid-1]->getChildNodes().begin(); ite != itEnd; ++ite)
+            {
+                //訪問済みは飛ばす
+                if (visited[*ite] == 1)
+                {
+                    continue;
+                }
 
-        _nodes[id-1]->setActivePower(_nodes[id-1]->getDefaultActivePower() + active);
-        _nodes[id-1]->setReactivePower(_nodes[id-1]->getDefaultReactivePower() + reactive);
+                S.push(*ite);                
+            }
+        }
+        //子ノードが全て訪問済みのノード
+        else
+        {
+            _nodes[nid-1]->setPreActivePower(_nodes[nid-1]->getActivePower());
+            _nodes[nid-1]->setPreReactivePower(_nodes[nid-1]->getReactivePower());
+            //cout << "***********     id:" << nid << "     ***********" << endl;
 
-        //cout << "id:" << id << " DA:" << _nodes[id-1]->getDefaultActivePower() << " DR:" << _nodes[id-1]->getDefaultReactivePower() << endl;
-        //_nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
-        //_nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
+            double active   = 0.0;
+            double reactive = 0.0;
 
-        visited[id] = 1;
-        DFS(parent, visited);
+            vector<int>::const_iterator itEnd = _nodes[nid-1]->getChildNodes().end();
+            for (vector<int>::const_iterator ite =_nodes[nid-1]->getChildNodes().begin(); ite != itEnd; ++ite)
+            {
+                double P = _nodes[*ite-1]->getPreActivePower();
+                complex<double> Q(0.0, _nodes[*ite-1]->getPreReactivePower());
+
+                double R = _R[id][*ite];
+                complex<double> X(0.0, _X[id][*ite]);
+
+                double V;
+                if (step == 1)
+                {
+                    V = 1.0;
+                }
+                else
+                {
+                    V = _nodes[*ite-1]->getAmplitude();
+                }
+                //cout << "V:" << V << endl;
+                complex<double> cActive(0.0, 0.0);
+                cActive   = P + ((R * ((P * P) + (Q * Q))) / (V * V));
+                
+                active   += cActive.real();
+
+                complex<double> cReactive(0.0, 0.0);
+                cReactive = Q + ((X * ((P * P) + (Q * Q))) / (V * V));
+
+                reactive += cReactive.imag();
+                //cout << "P:" << P << " Q:" << Q << " R:" << R << " X:" << X << " tmp:" << tmp << " V:" << V << endl;
+                //cout << "cActive:" << cActive << " cReactive:" << cReactive << endl;
+                //cout << "active: " << active << " | reactive:" << reactive << endl;
+            }
+            //cout << "id:" << id << " active:" << active << " reactive:" << reactive << endl;
+
+            _nodes[nid-1]->setActivePower(_nodes[nid-1]->getDefaultActivePower() + active);
+            _nodes[nid-1]->setReactivePower(_nodes[nid-1]->getDefaultReactivePower() + reactive);
+
+            //cout << "id:" << id << " DA:" << _nodes[nid-1]->getDefaultActivePower() << " DR:" << _nodes[nid-1]->getDefaultReactivePower() << endl;
+            //_nodes[nid-1]->setPreActivePower(_nodes[nid-1]->getActivePower());
+            //_nodes[nid-1]->setPreReactivePower(_nodes[nid-1]->getReactivePower());
+
+            visited[nid] = 1;
+            S.pop();
+            S.push(parent);
+        }
     }
 }
 
@@ -321,7 +297,7 @@ void BFS::DFS(int id, int visited[])
 bool BFS::checkChildrenVisited(int id, int visited[])
 {
     vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
-    for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ite++)
+    for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ++ite)
     {
         if (visited[*ite] == 0)
         {
@@ -337,7 +313,7 @@ bool BFS::isConvergence()
 {
     for (int i = 0; i < _nodes.size(); i++)
     {
-        if (abs(_nodes[i]->getPreAmplitude() - _nodes[i]->getAmplitude()) > EPS)
+        if (abs( _nodes[i]->getAmplitude() - _nodes[i]->getPreAmplitude()) > EPS)
         {
             return false;
         }
@@ -435,12 +411,14 @@ void BFS::buildNetwork()
                 _nodes[i]->setChildNodes(_nodes[j]->getId());
             }
         }
+        /*
         vector<int>::iterator itEnd1 = _nodes[i]->getChildNodes().end();
         for (vector<int>::iterator ite = _nodes[i]->getChildNodes().begin(); ite != itEnd1; ++ite)
         {
             cout << *ite << ",";
         }
         cout << endl;
+        */
     }
 }
 
@@ -463,36 +441,107 @@ DVEC BFS::getX() const
 }
 
 //======================================================================
+//再帰が深すぎる
 /*
-bool BFS::hasGrandchild(const Node* node) const
+void BFS::DFS(int id, int visited[])
 {
-    //debug
-    //cout << node->getId() << ":";
-
-    int p = 0;
-    int q = node->getChildNodes().size();
-    //cout << "q:" << q << " ";
-
-    //子ノードを持つ前提で使用
-    vector<int>::const_iterator itEnd = node->getChildNodes().end();
-
-    for (vector<int>::const_iterator ite = node->getChildNodes().begin(); ite != itEnd; ++ite)
+    //cout << "***********     id:" << id << "     ***********" << endl;
+    //終了条件
+    if (id == 0)
     {
-        //cout << *ite << ",";
-        if (!(hasChild(_nodes[*ite-1])))
+        return;
+    }
+    //親ノードのID
+    int parent = _nodes[id-1]->getParentNode();
+    if (parent == 0)
+    {
+        return;
+    }
+
+    //まず端点かどうかをチェック
+    if (!hasChild(_nodes[id-1]))
+    {
+        //cout << "***********     id:" << id << "     ***********" << endl;
+        _nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
+        _nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
+        visited[id] = 1;
+        DFS(parent, visited);
+    }
+    //次に子ノードがすべて訪問済みかどうかをチェック
+    else if (!checkChildrenVisited(id, visited))
+    {
+        vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
+        for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ++ite)
         {
-            p++;
-        }
-    }
+            if (visited[*ite] == 1)
+            {
+                continue;
+            }
 
-    //cout << " p:" << p << endl;
-    if (p == q)
-    {
-        return false;
-    }
+            DFS(*ite, visited);
+        }
+    } 
+    //それ以外
     else
     {
-        return true;
+        _nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
+        _nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
+        //cout << "***********     id:" << id << "     ***********" << endl;
+
+        double active   = 0.0;
+        double reactive = 0.0;
+        complex<double> imaginary(0.0, 1.0);
+
+        vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
+        for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ++ite)
+        {
+            double P = _nodes[*ite-1]->getPreActivePower();
+            complex<double> Q(0.0, _nodes[*ite-1]->getPreReactivePower());
+            //double P = _nodes[*ite-1]->getActivePower();
+            //complex<double> Q(0.0, _nodes[*ite-1]->getReactivePower());
+
+            double R = _R[id][*ite];
+            complex<double> X(0.0, _X[id][*ite]);
+
+            double V;
+            //cout << "step:" << step << endl;
+            //complex<double> tmp = Q * imaginary;
+            //double V = _nodes[*ite-1]->getAmplitude();
+            if (step == 1)
+            {
+                V = 1.05;//Utility::distance(P, _nodes[*ite-1]->getReactivePower());
+            }
+            else
+            {
+                V = _nodes[*ite-1]->getAmplitude();
+            }
+            //cout << "V:" << V << endl;
+            complex<double> cActive(0.0, 0.0);
+            cActive   = P + ((R * ((P * P) + (Q * Q))) / (V * V));
+            active   += cActive.real();
+
+            complex<double> cReactive(0.0, 0.0);
+            cReactive = Q + ((X * ((P * P) + (Q * Q))) / (V * V));
+
+            reactive += cReactive.imag();
+            //cout << "P:" << P << " Q:" << Q << " R:" << R << " X:" << X << " tmp:" << tmp << " V:" << V << endl;
+            //cout << "cActive:" << cActive << " cReactive:" << cReactive << endl;
+            //cout << "active: " << active << " | reactive:" << reactive << endl;
+        }
+        //cout << "id:" << id << " active:" << active << " reactive:" << reactive << endl;
+
+        _nodes[id-1]->setActivePower(_nodes[id-1]->getDefaultActivePower() + active);
+        _nodes[id-1]->setReactivePower(_nodes[id-1]->getDefaultReactivePower() + reactive);
+
+        //_nodes[id-1]->setActivePower(active);
+        //_nodes[id-1]->setReactivePower(reactive);
+
+        //cout << "id:" << id << " DA:" << _nodes[id-1]->getDefaultActivePower() << " DR:" << _nodes[id-1]->getDefaultReactivePower() << endl;
+        //_nodes[id-1]->setPreActivePower(_nodes[id-1]->getActivePower());
+        //_nodes[id-1]->setPreReactivePower(_nodes[id-1]->getReactivePower());
+
+        visited[id] = 1;
+        DFS(parent, visited);
     }
 }
 */

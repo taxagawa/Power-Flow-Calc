@@ -1,6 +1,7 @@
 GCC = g++
 #C11 = c++11
 PROGRAM = power
+CFLAGS = -g -O0 -ggdb
 
 OBJ =	main.o \
 		BFS.o \
@@ -13,7 +14,7 @@ OBJ =	main.o \
 all : $(PROGRAM)
 
 $(PROGRAM) : $(OBJ)
-		$(GCC) -Wall -g -o $@ $(OBJ)
+		$(GCC) $(CFLAGS) -o $@ $(OBJ)
 
 .PHONY : .o .cpp
 .cpp.o :

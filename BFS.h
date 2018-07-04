@@ -14,7 +14,7 @@ public:
     //計算する
     void CalcLoop();
 
-    //ノード・インピーダンスの設定
+    //ノードの設定
     void buildNetwork();
 
     //getter
@@ -31,8 +31,8 @@ private:
     //Backward計算
     void BackwardSweep(int id);
 
-    //深さ優先探索
-    void DFS(int id, int visited[]);
+    //再帰関数を用いた深さ優先探索
+    //void DFS(int id, int visited[]);
 
     //子ノードが訪問済みかどうかを調べる
     bool checkChildrenVisited(int id, int visited[]);
@@ -43,10 +43,8 @@ private:
     //子ノードを持つか
     bool hasChild(const Node* node) const;
 
-    //孫ノードを持つか
-    //bool hasGrandchild(const Node* node) const;
-
 private:
+    //作成したノードの集合
     std::vector<Node*> _nodes;
 
     int step;

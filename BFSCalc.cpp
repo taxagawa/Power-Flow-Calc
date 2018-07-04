@@ -1,7 +1,6 @@
 #include "BFS.h"
 #include "BFSCalc.h"
 #include "FileIO.h"
-#include "Network.h"
 #include "Utility.h"
 #include <iostream>
 #include <string>
@@ -11,7 +10,6 @@ using namespace std;
 //======================================================================
 BFSCalc::BFSCalc()
 {
-    //オブジェクトをメンバ変数にするのと、一時オブジェクトとして使うことの違いは？
     _fileIO = new FileIO();
 }
 

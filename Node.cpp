@@ -25,7 +25,7 @@ Node::Node(int id)
 //======================================================================
 Node::Node(const Node &node):_id(node._id),_activePower(node._activePower),_dActivePower(node._dActivePower),_pActivePower(node._pActivePower),_reactivePower(node._reactivePower),_dReactivePower(node._dReactivePower),_pReactivePower(node._pReactivePower),_amplitude(node._amplitude),_angle(node._angle),childNodes(node.childNodes)
 {
-    cout << "COPY" << cout;
+    //cout << "コピーコンストラクタ" << cout;
 }
 
 //======================================================================
