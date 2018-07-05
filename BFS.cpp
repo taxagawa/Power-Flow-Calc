@@ -33,6 +33,7 @@ BFS::BFS(const SVEC& _linkInfo, const SVEC& _initPower): step(1)
 //======================================================================
 void BFS::CalcLoop()
 {
+    //test
     buildNetwork();
 
     int beginId;
