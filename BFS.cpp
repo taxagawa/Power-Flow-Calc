@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <complex>
+#include <iomanip>
 #include <iostream>
 #include <stack>
 #include <string>
@@ -82,6 +83,10 @@ void BFS::CalcLoop()
 
         if (isConvergence() || step == 100)
         {
+            for (int i = 0; i < _nodes.size(); i++)
+            {
+                cout << "id: " << setfill('0') << setw(3) << right << i+1 << " | amp: " << setfill(' ') << setw(8) << left << _nodes[i]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[i]->getAngle()) << endl;
+            }
             break;
         }
 
@@ -116,7 +121,7 @@ void BFS::ForwardSweep(int beginId)
             if (id_vec.size() != 0)
             {
                 for (int i = 0; i < _size; i++)
-                {                    
+                {
                     id_vec.push_back(child_vec[i]);
                 }
             }
@@ -135,8 +140,8 @@ void BFS::ForwardSweep(int beginId)
             _nodes[id-1]->setAmplitude(1.05);
             _nodes[id-1]->setAngle(0.0);
 
-            cout << "id: " << id << " | active: " << _nodes[id-1]->getActivePower() << " | reactive: " << _nodes[id-1]->getReactivePower() << endl;
-            cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
+            //cout << "id: " << id << " | active: " << _nodes[id-1]->getActivePower() << " | reactive: " << _nodes[id-1]->getReactivePower() << endl;
+            //cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
             continue;
         }
         //slack nodeの本来の位相角
@@ -165,8 +170,8 @@ void BFS::ForwardSweep(int beginId)
         _nodes[id-1]->setAmplitude(vol);
         //slack nodeの位相角を0とするため、相対的に他のノードの角度をずらす必要がある（たぶん）
         _nodes[id-1]->setAngle(atan2(_nodes[id-1]->getReactivePower(), _nodes[id-1]->getActivePower()) - base_angle);
-        cout << "id: " << id << " | active: " << _nodes[id-1]->getActivePower() << " | reactive: " << _nodes[id-1]->getReactivePower() << endl;
-        cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
+        //cout << "id: " << id << " | active: " << _nodes[id-1]->getActivePower() << " | reactive: " << _nodes[id-1]->getReactivePower() << endl;
+        //cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
         }
 }
 
@@ -188,7 +193,7 @@ void BFS::BackwardSweep(int id)
     while (!S.empty())
     {
         int nid = S.top();
-        
+
         //終了条件
         if (nid == 0)
         {
@@ -222,7 +227,7 @@ void BFS::BackwardSweep(int id)
                     continue;
                 }
 
-                S.push(child_vec[i]);                
+                S.push(child_vec[i]);
             }
         }
         //子ノードが全て訪問済みのノード
@@ -256,7 +261,7 @@ void BFS::BackwardSweep(int id)
                 //cout << "V:" << V << endl;
                 complex<double> cActive(0.0, 0.0);
                 cActive   = P + ((R * ((P * P) + (Q * Q))) / (V * V));
-                
+
                 active   += cActive.real();
 
                 complex<double> cReactive(0.0, 0.0);
@@ -460,7 +465,7 @@ void BFS::DFS(int id, int visited[])
 
             DFS(*ite, visited);
         }
-    } 
+    }
     //それ以外
     else
     {
