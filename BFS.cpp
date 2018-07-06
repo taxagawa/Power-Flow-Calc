@@ -19,6 +19,7 @@ using namespace std;
 
 #define EPS 1.0E-8
 
+//教訓：iteratorは無闇に使うべきではない
 
 //======================================================================
 BFS::BFS(const SVEC& _linkInfo, const SVEC& _initPower): step(1)
@@ -36,6 +37,7 @@ void BFS::CalcLoop()
     buildNetwork();
 
     int beginId;
+    //slack nodeの親ノードのidは0としておく(link.txt参照)
     int slackNodeParentId = 0;
 
     for (int i = _nodes.size()-1; i >= 0; i--)
@@ -62,9 +64,9 @@ void BFS::CalcLoop()
     while (true)
     {
         cout << "*********************************************************" << endl;
-        cout << "*Calculation Step: " << step << endl;
+        cout << "*    Calculation Step: " << step << endl;
         cout << "*********************************************************" << endl;
-        //単純に計算が多すぎてセグフォ出てるので、探索方法を変える
+
         BackwardSweep(endId);
         /*
         for (int i = 0; i < _nodes.size(); i++)
@@ -105,43 +107,25 @@ void BFS::ForwardSweep(int beginId)
         //元に戻す
         reverse(id_vec.begin(), id_vec.end());
 
-        //debug
-        /*
-        //cout << "size:" << _nodes[id-1]->getChildNodes().size() << endl;
-        vector<int>::iterator itEnd1 = _nodes[id-1]->getChildNodes().end();
-        for (vector<int>::iterator ite = _nodes[id-1]->getChildNodes().begin(); ite != itEnd1; ite++)
-        {
-            cout << *ite << ",";
-        }
-        cout << endl;
-        */
+        vector<int> child_vec = _nodes[id-1]->getChildNodes();
+        int _size = child_vec.size();
+
         //番号がidのノードの子ノードベクトルをid_vecの末尾に接続
-        if (_nodes[id-1]->getChildNodes().size() != 0)
+        if (_size != 0)
         {
             if (id_vec.size() != 0)
             {
-                vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
-                for (vector<int>::const_iterator ite = _nodes[id-1]->getChildNodes().begin(); ite != itEnd; ite++)
-                {
-                    //cout << *ite << ",";
-                    id_vec.push_back(*ite);
+                for (int i = 0; i < _size; i++)
+                {                    
+                    id_vec.push_back(child_vec[i]);
                 }
             }
             else
             {
-                id_vec = _nodes[id-1]->getChildNodes();
+                id_vec = child_vec;
             }
         }
 
-        //debug
-        /*
-        vector<int>::iterator itEnd2 = id_vec.end();
-        for (vector<int>::iterator ite = id_vec.begin(); ite != itEnd2; ite++)
-        {
-            cout << *ite << ",";
-        }
-        cout << endl;
-        */
         //収束判定のために、前ステップにおける振幅の値を_preAmplitudeに保存
         _nodes[id-1]->setPreAmplitude(_nodes[id-1]->getAmplitude());
 
@@ -151,10 +135,11 @@ void BFS::ForwardSweep(int beginId)
             _nodes[id-1]->setAmplitude(1.05);
             _nodes[id-1]->setAngle(0.0);
 
-            //cout << "active:" << _nodes[id-1]->getActivePower() << " reactive:" << _nodes[id-1]->getReactivePower() << endl;
+            cout << "id: " << id << " | active: " << _nodes[id-1]->getActivePower() << " | reactive: " << _nodes[id-1]->getReactivePower() << endl;
             cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
             continue;
         }
+        //slack nodeの本来の位相角
         double base_angle = atan2(_nodes[beginId-1]->getReactivePower(), _nodes[beginId-1]->getActivePower());
 
         int parentNodeIdx = (_nodes[id-1]->getParentNode())-1;
@@ -169,6 +154,7 @@ void BFS::ForwardSweep(int beginId)
         //cout << "X:" << X << endl;
         //_Rと_Xはindexではなくidで管理
         complex<double> tmp1 = 1.0 - (((parentP * _R[id][parentNodeIdx+1]) + (parentQ * X)) / (parentV * parentV));
+        //参照論文から式の符号を修正
         complex<double> tmp2 = (((parentQ * _R[id][parentNodeIdx+1]) + (parentP * X)) * imag) / (parentV * parentV);
 
         complex<double> tmp3 = tmp1 + tmp2;
@@ -177,8 +163,9 @@ void BFS::ForwardSweep(int beginId)
         double vol = parentV * tmp3.real();
 
         _nodes[id-1]->setAmplitude(vol);
+        //slack nodeの位相角を0とするため、相対的に他のノードの角度をずらす必要がある（たぶん）
         _nodes[id-1]->setAngle(atan2(_nodes[id-1]->getReactivePower(), _nodes[id-1]->getActivePower()) - base_angle);
-        //cout << "id: " << id << " | active: " << _nodes[id-1]->getActivePower() << " | reactive: " << _nodes[id-1]->getReactivePower() << endl;
+        cout << "id: " << id << " | active: " << _nodes[id-1]->getActivePower() << " | reactive: " << _nodes[id-1]->getReactivePower() << endl;
         cout << "id: " << id << " | amp: " << _nodes[id-1]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[id-1]->getAngle()) << endl;
         }
 }
@@ -201,6 +188,7 @@ void BFS::BackwardSweep(int id)
     while (!S.empty())
     {
         int nid = S.top();
+        
         //終了条件
         if (nid == 0)
         {
@@ -210,6 +198,9 @@ void BFS::BackwardSweep(int id)
 
         //親ノードのID
         int parent = _nodes[nid-1]->getParentNode();
+
+        vector<int> child_vec = _nodes[nid-1]->getChildNodes();
+        int _size = child_vec.size();
         //cout << " parent:" << parent << endl;
         //まず端点かどうかをチェック
         if (!hasChild(_nodes[nid-1]))
@@ -223,16 +214,15 @@ void BFS::BackwardSweep(int id)
         //次に子ノードがすべて訪問済みかどうかをチェック
         else if (!checkChildrenVisited(nid, visited))
         {
-            vector<int>::const_iterator itEnd = _nodes[nid-1]->getChildNodes().end();
-            for (vector<int>::const_iterator ite =_nodes[nid-1]->getChildNodes().begin(); ite != itEnd; ++ite)
+            for (int i = 0; i < _size; i++)
             {
                 //訪問済みは飛ばす
-                if (visited[*ite] == 1)
+                if (visited[child_vec[i]] == 1)
                 {
                     continue;
                 }
 
-                S.push(*ite);                
+                S.push(child_vec[i]);                
             }
         }
         //子ノードが全て訪問済みのノード
@@ -245,14 +235,14 @@ void BFS::BackwardSweep(int id)
             double active   = 0.0;
             double reactive = 0.0;
 
-            vector<int>::const_iterator itEnd = _nodes[nid-1]->getChildNodes().end();
-            for (vector<int>::const_iterator ite =_nodes[nid-1]->getChildNodes().begin(); ite != itEnd; ++ite)
+            for (int i = 0; i < _size; i++)
             {
-                double P = _nodes[*ite-1]->getPreActivePower();
-                complex<double> Q(0.0, _nodes[*ite-1]->getPreReactivePower());
+                int tmp_idx = child_vec[i]-1;
+                double P = _nodes[tmp_idx]->getPreActivePower();
+                complex<double> Q(0.0, _nodes[tmp_idx]->getPreReactivePower());
 
-                double R = _R[id][*ite];
-                complex<double> X(0.0, _X[id][*ite]);
+                double R = _R[nid][tmp_idx+1];
+                complex<double> X(0.0, _X[nid][tmp_idx+1]);
 
                 double V;
                 if (step == 1)
@@ -261,7 +251,7 @@ void BFS::BackwardSweep(int id)
                 }
                 else
                 {
-                    V = _nodes[*ite-1]->getAmplitude();
+                    V = _nodes[tmp_idx]->getAmplitude();
                 }
                 //cout << "V:" << V << endl;
                 complex<double> cActive(0.0, 0.0);
@@ -296,10 +286,11 @@ void BFS::BackwardSweep(int id)
 //======================================================================
 bool BFS::checkChildrenVisited(int id, int visited[])
 {
-    vector<int>::const_iterator itEnd = _nodes[id-1]->getChildNodes().end();
-    for (vector<int>::const_iterator ite =_nodes[id-1]->getChildNodes().begin(); ite != itEnd; ++ite)
+    vector<int> v = _nodes[id-1]->getChildNodes();
+    int _size = v.size();
+    for (int i = 0; i < _size; i++)
     {
-        if (visited[*ite] == 0)
+        if (visited[v[i]] == 0)
         {
             return false;
         }
@@ -335,9 +326,6 @@ bool BFS::hasChild(const Node* node) const
 //======================================================================
 void BFS::buildNetwork()
 {
-    //Todo:計算量が多いので余裕があればパフォーマンスチューニング
-    //それとメソッドかクラスに分ける
-
     //ノードの接続状況とインピーダンス行列の生成
     for (int i = 0; i < _link.size()-1; i++)
     {
@@ -411,14 +399,6 @@ void BFS::buildNetwork()
                 _nodes[i]->setChildNodes(_nodes[j]->getId());
             }
         }
-        /*
-        vector<int>::iterator itEnd1 = _nodes[i]->getChildNodes().end();
-        for (vector<int>::iterator ite = _nodes[i]->getChildNodes().begin(); ite != itEnd1; ++ite)
-        {
-            cout << *ite << ",";
-        }
-        cout << endl;
-        */
     }
 }
 
