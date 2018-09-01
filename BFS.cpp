@@ -23,13 +23,16 @@ using namespace std;
 //教訓：iteratorは無闇に使うべきではない
 
 //======================================================================
-BFS::BFS(const SVEC& _linkInfo, const SVEC& _initPower): step(1)
+BFS::BFS(const SVEC& _linkInfo, const SVEC& _initPower): step(1),limit(100)
 {
     _link  = _linkInfo;
     _power = _initPower;
 
     _R = DVEC(_link.size(), vector<double>(_link.size(), 0));
     _X = DVEC(_link.size(), vector<double>(_link.size(), 0));
+
+    outputAm = DVEC(_link.size(), vector<double>(limit+1, 0));
+    outputTh = DVEC(_link.size(), vector<double>(limit+1, 0));
 }
 
 //======================================================================
@@ -62,11 +65,19 @@ void BFS::CalcLoop()
         }
     }
 
+    for (int i = 0; i < _nodes.size(); i++)
+    {
+        outputAm[i+1][0] = (double)(i+1);
+        outputTh[i+1][0] = (double)(i+1);
+    }
+
     while (true)
     {
         cout << "*********************************************************" << endl;
         cout << "*    Calculation Step: " << step << endl;
         cout << "*********************************************************" << endl;
+
+        setOutput();
 
         BackwardSweep(endId);
         /*
@@ -81,11 +92,16 @@ void BFS::CalcLoop()
         */
         ForwardSweep(beginId);
 
-        if (isConvergence() || step == 100)
+        if (isConvergence() || step == limit)
         {
             for (int i = 0; i < _nodes.size(); i++)
             {
-                cout << "id: " << setfill('0') << setw(3) << right << i+1 << " | amp: " << setfill(' ') << setw(8) << left << _nodes[i]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[i]->getAngle()) << endl;
+                outputAm[0][step+1] = (double)step;
+                outputTh[0][step+1] = (double)step;
+
+                outputAm[i+1][step+1] = _nodes[i]->getAmplitude();
+                outputTh[i+1][step+1] = _nodes[i]->getAngle();
+                //cout << "id: " << setfill('0') << setw(3) << right << i+1 << " | amp: " << setfill(' ') << setw(8) << left << _nodes[i]->getAmplitude() << " | theta: " << rad_to_deg(_nodes[i]->getAngle()) << endl;
             }
             break;
         }
@@ -329,6 +345,20 @@ bool BFS::hasChild(const Node* node) const
 }
 
 //======================================================================
+void BFS::setOutput()
+{
+    //ファイルの一行目
+    outputAm[0][step] = (double)(step-1);
+    outputTh[0][step] = (double)(step-1);
+
+    for (int i = 0; i < _nodes.size(); i++)
+    {
+        outputAm[i+1][step] = _nodes[i]->getAmplitude();
+        outputTh[i+1][step] = _nodes[i]->getAngle();
+    }
+}
+
+//======================================================================
 void BFS::buildNetwork()
 {
     //ノードの接続状況とインピーダンス行列の生成
@@ -423,6 +453,24 @@ DVEC BFS::getR() const
 DVEC BFS::getX() const
 {
     return _X;
+}
+
+//======================================================================
+DVEC BFS::getOutputAm() const
+{
+    return outputAm;
+}
+
+//======================================================================
+DVEC BFS::getOutputTh() const
+{
+    return outputTh;
+}
+
+//======================================================================
+int BFS::getStepNum() const
+{
+    return step;
 }
 
 //======================================================================

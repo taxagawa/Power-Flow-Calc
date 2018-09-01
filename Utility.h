@@ -30,6 +30,7 @@ public:
 private:
     Utility(){};
     ~Utility(){};
+
 };
 
 #endif //__UTILITY_H__

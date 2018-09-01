@@ -33,6 +33,15 @@ private:
     //リアクタンス行列
     DVEC _X;
 
+    //振幅結果行列
+    DVEC outputAm;
+
+    //位相結果行列
+    DVEC outputTh;
+
+    //最終ステップ数
+    int finalStepNum;
+
 };
 
 #endif //__BFSCALC_H__

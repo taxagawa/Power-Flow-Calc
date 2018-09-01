@@ -14,16 +14,6 @@ public:
     //計算する
     void CalcLoop();
 
-    //ノードの設定
-    void buildNetwork();
-
-    //getter
-    std::vector<Node*> getNodes() const;
-
-    DVEC getR() const;
-
-    DVEC getX() const;
-
 private:
     //Forward計算
     void ForwardSweep(int beginId);
@@ -43,11 +33,34 @@ private:
     //子ノードを持つか
     bool hasChild(const Node* node) const;
 
+    //結果を格納する
+    void setOutput();
+
+public:
+    //ノードの設定
+    void buildNetwork();
+
+    //getter
+    std::vector<Node*> getNodes() const;
+
+    DVEC getR() const;
+
+    DVEC getX() const;
+
+    DVEC getOutputAm() const;
+
+    DVEC getOutputTh() const;
+
+    int getStepNum() const;
+
 private:
     //作成したノードの集合
     std::vector<Node*> _nodes;
 
     int step;
+
+    //最大step数
+    int limit;
 
     SVEC _link;
 
@@ -58,6 +71,12 @@ private:
 
     //リアクタンス行列
     DVEC _X;
+
+    //結果(振幅)を格納した行列
+    DVEC outputAm;
+
+    //結果(位相)を格納した行列
+    DVEC outputTh;
 };
 
 #endif //__BFS_H__

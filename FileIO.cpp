@@ -111,3 +111,38 @@ vector<string> FileIO::split(const string &str, char delim){
     }
     return res;
 }
+
+//====================================================================
+void FileIO::receiveOutput(const DVEC& outputAm, const DVEC& outputTh, int num)
+{
+    _outputAm = outputAm;
+    _outputTh = outputTh;
+
+    outputFactory(_outputAm, num, addPath("outputAm.txt").c_str());
+    outputFactory(_outputTh, num, addPath("outputTh.txt").c_str());
+}
+
+//====================================================================
+void FileIO::outputFactory(DVEC output, int num, string fileName)
+{
+    ofstream outFile(fileName.c_str(), ios::out);
+    if (!outFile.fail())
+    {
+        for (int i = 0; i < output.size(); i++)
+        {
+            for (int j = 0; j < num + 1; j++)
+            {
+                //先頭に'#'を挿入
+                if (i == 0 && j == 0)
+                {
+                    outFile << "#" << " ";
+                    continue;
+                }
+
+                outFile << Utility::dtostr(output[i][j]) << " ";
+            }
+            outFile << Utility::dtostr(output[i][num+1]) << endl;
+        }
+        outFile.close();
+    }
+}
