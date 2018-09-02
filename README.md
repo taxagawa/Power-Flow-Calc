@@ -1,5 +1,5 @@
 # Power Flow Calculation
 
 ## TODO
-* change the type of Q and R to complex
-* modify BackwardSweep() function
+* write shell script for a least-squares line on a scatter plot　to compare the results with exact solutions
+* rewrite the codes to match the results and exact solutions
