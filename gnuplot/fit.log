@@ -1,0 +1,56 @@
+
+
+*******************************************************************************
+Tue Sep  4 22:04:46 2018
+
+
+FIT:    data read from "outputAm.dat" using 40:41
+        format = x:z
+        x range restricted to [0.950000 : 1.06000]
+        #datapoints = 106
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*x+b
+fitted parameters initialized with current variable values
+
+Warning: Initial value of parameter 'b' is zero.
+iter      chisq       delta/lim  lambda   a             b            
+   0 3.0799861505e-02   0.00e+00  6.93e-01    1.000000e+00   1.000000e-30
+BREAK: Singular matrix in Invert_RtR
+
+*******************************************************************************
+Tue Sep  4 22:05:01 2018
+
+
+FIT:    data read from "outputAm.dat" using 40:41
+        format = x:z
+        x range restricted to [0.950000 : 1.06000]
+        #datapoints = 106
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*x+b
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b            
+   0 1.0255104586e+02   0.00e+00  9.90e-01    1.000000e+00   1.000000e+00
+   4 1.6945413315e-03  -3.99e-01  9.90e-05    8.993928e-01   1.149947e-01
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00169454
+rel. change during last iteration : -3.98638e-06
+
+degrees of freedom    (FIT_NDF)                        : 104
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.00403654
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.62937e-05
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 0.899393         +/- 0.01736      (1.93%)
+b               = 0.114995         +/- 0.01702      (14.8%)
+
+correlation matrix of the fit parameters:
+                a      b      
+a               1.000 
+b              -1.000  1.000 

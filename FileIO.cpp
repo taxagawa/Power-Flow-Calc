@@ -45,6 +45,9 @@ bool FileIO::setData(int argc, char** argv)
     readLinkInfo();
     readInitPower();
 
+    readAmplitude();
+    readAngle();
+
     return true;
 }
 
@@ -79,6 +82,40 @@ void FileIO::readInitPower()
     while (getline(inPowerfile, str))
     {
         _initPower.push_back(split(str, ','));
+    }
+}
+
+//====================================================================
+void FileIO::readAmplitude()
+{
+    ifstream inAmpfile(addPath("amp.txt").c_str(), ios::in);
+    if (!inAmpfile)
+    {
+        cerr << "Error: cannot find or open amplitude file" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    string str;
+    while (getline(inAmpfile, str))
+    {
+        _A.push_back(str);
+    }
+}
+
+//====================================================================
+void FileIO::readAngle()
+{
+    ifstream inAnglefile(addPath("angle.txt").c_str(), ios::in);
+    if (!inAnglefile)
+    {
+        cerr << "Error: cannot find or open angle file" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    string str;
+    while (getline(inAnglefile, str))
+    {
+        _angle.push_back(str);
     }
 }
 
@@ -118,19 +155,19 @@ void FileIO::receiveOutput(const DVEC& outputAm, const DVEC& outputTh, int num)
     _outputAm = outputAm;
     _outputTh = outputTh;
 
-    outputFactory(_outputAm, num, addPath("gnuplot/outputAm.dat").c_str());
-    outputFactory(_outputTh, num, addPath("gnuplot/outputTh.dat").c_str());
+    outputFactory(_outputAm, num, addPath("gnuplot/outputAm.dat").c_str(), _A);
+    outputFactory(_outputTh, num, addPath("gnuplot/outputTh.dat").c_str(), _angle);
 }
 
 //====================================================================
-void FileIO::outputFactory(DVEC output, int num, string fileName)
+void FileIO::outputFactory(DVEC output, int num, string fileName, vector<string> solution)
 {
     ofstream outFile(fileName.c_str(), ios::out);
     if (!outFile.fail())
     {
         for (int i = 0; i < output.size(); i++)
         {
-            for (int j = 0; j < num + 1; j++)
+            for (int j = 0; j < num + 2; j++)
             {
                 //先頭に'#'を挿入
                 if (i == 0 && j == 0)
@@ -141,7 +178,14 @@ void FileIO::outputFactory(DVEC output, int num, string fileName)
 
                 outFile << Utility::dtostr(output[i][j]) << " ";
             }
-            outFile << Utility::dtostr(output[i][num+1]) << endl;
+
+            if (i == 0)
+            {
+                outFile << "G" << endl;
+                continue;
+            }
+
+            outFile << solution[i-1] << endl;
         }
         outFile.close();
     }
