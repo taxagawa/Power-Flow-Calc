@@ -118,8 +118,8 @@ void FileIO::receiveOutput(const DVEC& outputAm, const DVEC& outputTh, int num)
     _outputAm = outputAm;
     _outputTh = outputTh;
 
-    outputFactory(_outputAm, num, addPath("outputAm.txt").c_str());
-    outputFactory(_outputTh, num, addPath("outputTh.txt").c_str());
+    outputFactory(_outputAm, num, addPath("gnuplot/outputAm.dat").c_str());
+    outputFactory(_outputTh, num, addPath("gnuplot/outputTh.dat").c_str());
 }
 
 //====================================================================
