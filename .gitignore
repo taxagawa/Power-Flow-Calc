@@ -1,4 +1,5 @@
 *.o
+*.png
 core*
 power
 gnuplot/*.log
