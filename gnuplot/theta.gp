@@ -6,7 +6,7 @@ set title 'Angle' font ",15"
 set xr[-1.2:0.1]
 set yr[-1.2:0.1]
 set xlabel 'output' font ",13"
-set ylabel 'ideal solution' font ",13"
+set ylabel 'exact solution' font ",13"
 
 set output 'Angle.png'
 
